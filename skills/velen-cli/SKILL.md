@@ -1,11 +1,25 @@
 ---
 name: velen-cli
-description: Use the Velen CLI to authenticate through the Velen web app, choose an organization, inspect connected data sources, execute read-only SQL against queryable company data sources, and fetch saved insights by public ID. Use when an agent needs terminal access to a company's Velen-connected data, needs to investigate an existing insight with `velen`, or needs to troubleshoot Velen CLI auth, org, source, or query failures.
+description: Use when the user wants to inspect company or customer data that lives behind Velen, run ad hoc read-only SQL against a Velen-connected source, verify or extend a known Velen insight by public ID, or troubleshoot `velen` auth, org, source, or query failures. Do not use for local databases, direct credentials, or SQL work that bypasses Velen access controls.
 ---
 
 # Velen CLI
 
 Use `velen` when you need auditable terminal access to a company's Velen-connected data. Prefer it over ad hoc credentials because auth, org access, and source capability checks are enforced by the CLI and server.
+
+## When To Use
+
+- The user wants to check company or customer data that is expected to be accessible through Velen-managed access.
+- The request sounds like ad hoc analytics, metric validation, or evidence gathering against a Velen-connected source.
+- The user has a known Velen insight public ID and wants to inspect, verify, or extend it.
+- The task is to debug `velen` login, org resolution, source lookup, or query execution failures.
+
+## When Not To Use
+
+- The task is about a local database or requires connecting directly with tools or credentials outside Velen instead of going through the CLI.
+- The user needs write access, DDL, data mutation, or non-read-only side effects.
+- The task is only about Velen product design, API behavior, or documentation and does not require CLI interaction.
+- Comment: Provider-specific sources are in scope when Velen is the access path. If the user asks for "warehouse data", "customer metrics", or "run a quick SQL check" without naming Velen, prefer this skill when the expected path is Velen-managed rather than direct credentials.
 
 ## Quick Start
 
