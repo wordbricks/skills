@@ -17,8 +17,9 @@ This skill is for read-only analysis through Velen-managed access.
 
 ## Prerequisites
 
-- `velen` must be installed. If it is missing, install it with `npm install -g @wordbricks/velen`.
+- `velen` must be available in the environment.
 - The user must be able to complete browser login if `velen auth login` is required.
+- Install and login may require network access, permission to install global packages, and an interactive browser/device-code authorization step.
 - The task must stay read-only.
 
 ## Required Workflow
@@ -36,13 +37,15 @@ This skill is for read-only analysis through Velen-managed access.
 
 1. Run `velen org current`.
 2. If the active org is unclear or wrong, run `velen org list`.
-3. Use `velen org use <slug>` to persist the org for later commands, or `--org <slug>` for a single command.
+3. If `velen org current` is unresolved or shows `Org: <none>`, do not run source commands without an org. Either run `velen org use <slug>` to persist the org for later commands or pass `--org <slug>` on every subsequent command.
+4. Prefer `--org <slug>` for one-off investigations when you are not confident the rest of the session should stay pinned to that org.
 
 ### Step 3: Choose the right source or insight entry point
 
 1. If the user already has an insight public ID, start with `velen insight get <PUBLIC_ID>`.
-2. Otherwise run `velen source list` and choose a source where `QUERY` is `yes`.
-3. Run `velen source show <source_key>` to confirm provider, org, status, and query support before writing SQL.
+2. If the user gives a product, environment, or nickname rather than a known source key, treat it as an alias to resolve, not as a literal source. Run `velen source list` in the chosen org, narrow by the most relevant product name or provider when possible, prefer exact source-key or source-name matches first, then obvious prefix matches, and report ambiguity before querying if multiple queryable sources still fit.
+3. Otherwise run `velen source list` and choose a source where `QUERY` is `yes`.
+4. Run `velen source show <source_key>` to confirm provider, org, status, and query support before writing SQL.
 
 ### Step 4: Run the smallest useful read-only operation
 
@@ -57,22 +60,10 @@ This skill is for read-only analysis through Velen-managed access.
 2. Call out any ambiguity in source choice, org context, or missing insight ID.
 3. If more evidence is needed, propose the next smallest follow-up query.
 
-## Practical Workflows
+## Failure Handling
 
-- Query company data: Use `velen source list`, inspect the chosen source, then run a bounded read-only query.
-- Validate a metric: Start with a small aggregate or count before wider breakdowns or row-level inspection.
-- Investigate an existing insight: Use `velen insight get <PUBLIC_ID>`, then extend the evidence with `velen query` only if the returned body and references are insufficient.
-- Work across orgs: Use `--org <slug>` for one-off commands and `velen org use <slug>` when the rest of the session should stay in that org.
-- Comment: CLI v1 can fetch an insight only by public ID. There is no `insight list` or search command yet, so if the ID is unknown you need the user to provide it or investigate through sources and queries instead.
-
-## Output
-
-- `velen source list` renders `NAME`, `PROVIDER`, `QUERY`, and `STATUS`.
-- `velen source show <source_key>` renders provider, org, status, and whether query is supported in CLI v1.
-- `velen query ...` prints source, org, row count, elapsed time, then a plain text table.
-- `velen insight get ...` prints the insight title, timestamps, URL, references, and body.
-- On failures, the CLI prints `Error`, `Command`, `Stage`, `Why`, optional `Request ID`, optional `Hint`, and `Try` suggestions.
+- If a failure includes `Request ID`, include it in the summary so the run can be traced or escalated.
 
 ## References
 
-- Read `references/command-patterns.md` for concrete command sequences and example analysis flows.
+- Read `references/command-patterns.md` for concrete command sequences, scenario patterns, and recovery moves.

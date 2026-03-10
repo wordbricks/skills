@@ -58,6 +58,35 @@ velen --org acme query --source warehouse --file ./analysis.sql
 
 Prefer `--file` or `--stdin` for multi-line SQL so the query can be inspected, revised, and rerun cleanly.
 
+## Query Company Data
+
+- Resolve the org first, then inspect sources in that org.
+- Narrow source selection by the most relevant product name or provider before inspecting multiple candidates.
+- Confirm the source with `velen source show <source_key>`.
+- Start with a bounded aggregate or `select 1` before wider inspection.
+
+## Validate A Metric
+
+- Start with the smallest aggregate or count that tests the metric definition.
+- Add explicit date bounds before expanding the query.
+- Prefer follow-up breakdowns only after the base aggregate looks correct.
+
+## Work Across Orgs
+
+```bash
+velen --org acme source list
+velen --org acme query --source warehouse --sql "select 1"
+velen org use acme
+```
+
+Use `--org <slug>` for one-off checks. Use `velen org use <slug>` only when the rest of the session should stay pinned to that org.
+
+## Resolve Informal Source Names
+
+- If the user gives a product name, environment, or nickname instead of a canonical source key, treat it as an alias to resolve.
+- Prefer exact source-key or source-name matches first, then obvious prefix matches.
+- If multiple queryable sources still fit, report the ambiguity before querying.
+
 ## Investigate A Known Insight
 
 ```bash
