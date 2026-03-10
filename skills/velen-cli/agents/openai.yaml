@@ -1,0 +1,4 @@
+interface:
+  display_name: "Velen CLI"
+  short_description: "Query Velen data sources and inspect insights"
+  default_prompt: "Use $velen-cli to authenticate, choose the right org and source, run a read-only query, and summarize the result with evidence."
