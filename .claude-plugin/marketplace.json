@@ -1,0 +1,14 @@
+{
+  "name": "wordbricks",
+  "owner": {
+    "name": "Wordbricks",
+    "url": "https://github.com/wordbricks"
+  },
+  "plugins": [
+    {
+      "name": "velen",
+      "source": "./plugins/velen",
+      "description": "Claude Code plugin for Velen CLI workflows and read-only Velen-managed data access."
+    }
+  ]
+}

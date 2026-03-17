@@ -1,0 +1,18 @@
+{
+  "name": "velen",
+  "description": "Claude Code plugin for Velen CLI workflows and read-only Velen-managed data access.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Wordbricks",
+    "url": "https://github.com/wordbricks"
+  },
+  "repository": "https://github.com/wordbricks/skills",
+  "keywords": [
+    "velen",
+    "sql",
+    "analytics",
+    "data",
+    "insights",
+    "cli"
+  ]
+}

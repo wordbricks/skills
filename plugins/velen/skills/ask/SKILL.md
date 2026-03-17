@@ -1,5 +1,5 @@
 ---
-name: velen
+name: ask
 description: Use when the user wants to inspect company or customer data that lives behind Velen, resolve org or source context, validate or execute ad hoc read-only SQL against a Velen-connected source, or inspect published insights. Do not use for local databases, direct credentials, or write operations that bypass Velen access controls.
 ---
 
@@ -14,9 +14,6 @@ This skill is for read-only analysis through Velen-managed access.
 - Use it when the user wants company or customer data that is expected to be available through Velen, wants to validate a metric with ad hoc SQL, needs to inspect sources or org context, or wants to inspect published insights.
 - Do not use it for local databases, direct credentials, write operations, DDL, or product/documentation questions that do not require CLI access.
 - Once org resolution is clear, prefer `--org <slug>` on org-scoped commands rather than relying on persisted local state.
-- Comment: Agent runs are non-TTY, so `velen` defaults to JSON output already. Add `--output text` only when you explicitly want presentation output.
-- Comment: Provider-specific sources are still in scope when Velen is the access path. If the user asks for "warehouse data", "customer metrics", or "run a quick SQL check" without naming Velen, prefer this skill when the expected path is Velen-managed rather than direct credentials.
-- Comment: This repo's skill originally reflected an older `velen query` shorthand. The current CLI contract uses explicit subcommands like `velen query execute` and `velen query validate`, so verify unfamiliar command shapes with `velen schema command <path>` instead of guessing.
 
 ## Prerequisites
 

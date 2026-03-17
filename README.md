@@ -1,51 +1,75 @@
-# Wordbricks Skills
+# Wordbricks Plugins For Claude Code
 
-Installable agent skills published by Wordbricks.
-
-This repo also works as a Claude Code plugin root.
+This repository is a Claude Code marketplace containing the `velen` plugin.
 
 Comment: the Velen CLI now ships its own embedded skill metadata through `velen schema skills`, while this repo packages a separately maintained Claude plugin. Keep the examples here aligned with the live CLI contract rather than assuming the two stay in sync automatically.
 
-## Claude Code Plugin
+## Installation
 
-Load this repo as a local Claude Code plugin:
+### Add the marketplace
+
+Add this marketplace to Claude Code:
 
 ```bash
-claude --plugin-dir /Users/starush/work/skills
+/plugin marketplace add wordbricks/skills
 ```
 
-The plugin namespace is `wordbricks`, so the Velen skill is available as:
+### Install the `velen` plugin
+
+After adding the marketplace:
+
+```bash
+/plugin install velen@wordbricks
+```
+
+Or browse interactively:
+
+```bash
+/plugin
+```
+
+### Local development
+
+Load the plugin directly from this checkout:
+
+```bash
+claude --plugin-dir /Users/starush/work/skills/plugins/velen
+```
+
+## Usage
+
+Invoke the plugin skill with:
 
 ```text
-/wordbricks:velen
+/velen:ask
 ```
 
-## Install
+Use it to authenticate with the Velen CLI, resolve org and source context, inspect published insights, and run bounded read-only queries through Velen-managed access.
 
-Install the `velen` skill from this repo with either `npx` or `bunx`:
+### Team installation
 
-```bash
-npx skills add wordbricks/skills --skill velen
+For team-wide plugin usage, add this to your project's `.claude/settings.json`:
+
+```json
+{
+  "extraKnownMarketplaces": {
+    "wordbricks": {
+      "source": {
+        "source": "github",
+        "repo": "wordbricks/skills"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "velen@wordbricks": true
+  }
+}
 ```
 
-```bash
-bunx skills add wordbricks/skills --skill velen
-```
+Team members will be prompted to install the plugin when they trust the repository.
 
-You can also install from a full GitHub URL with either `npx` or `bunx`:
+## Structure
 
-```bash
-npx skills add https://github.com/wordbricks/skills --skill velen
-```
-
-```bash
-bunx skills add https://github.com/wordbricks/skills --skill velen
-```
-
-## Available Skills
-
-### `velen`
-
-Use the Velen CLI to authenticate, resolve org context, inspect connected data sources, validate or execute read-only SQL queries, and inspect published insights.
-
-Path: `skills/velen`
+- Marketplace metadata: `.claude-plugin/marketplace.json`
+- Plugin root: `plugins/velen`
+- Skill path: `plugins/velen/skills/ask`
