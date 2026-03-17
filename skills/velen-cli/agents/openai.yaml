@@ -1,4 +1,0 @@
-interface:
-  display_name: "Velen CLI"
-  short_description: "Inspect Velen-connected company data"
-  default_prompt: "Use $velen-cli to inspect Velen-connected company data, choose the right org and source, run a read-only query, and summarize the evidence."

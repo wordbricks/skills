@@ -1,0 +1,8 @@
+{
+  "name": "wordbricks",
+  "description": "Claude Code plugin with a Velen CLI skill for org-aware, read-only data access through Velen.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Wordbricks"
+  }
+}
