@@ -1,0 +1,4 @@
+interface:
+  display_name: "Velen CLI"
+  short_description: "Inspect Velen-connected company data"
+  default_prompt: "Use $ask to resolve org and source context, prefer --org <slug>, inspect Velen-connected data or insights, run read-only query validate or execute flows, and summarize the evidence."
