@@ -19,9 +19,9 @@ Invoke the plugin skill with:
 /onequery:ask
 ```
 
-Use it to resolve org and source context, inspect the public CLI schema
-surface, validate read-only SQL, and run bounded read-only queries through
-OneQuery-managed access.
+Use it to resolve org and source context, inspect the CLI surface, validate
+read-only SQL, and run bounded read-only queries through OneQuery-managed
+access.
 
 ## Local Development
 

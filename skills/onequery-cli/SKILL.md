@@ -1,5 +1,5 @@
 ---
-name: ask
+name: onequery-cli
 description: Use when the user wants to inspect company or customer data that lives behind OneQuery, resolve org or source context, validate or run ad hoc read-only SQL against a OneQuery-connected source, or discover available OneQuery CLI commands. Do not use for local databases, direct credentials, or write operations that bypass OneQuery access controls.
 ---
 

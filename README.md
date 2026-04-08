@@ -1,6 +1,6 @@
-# Wordbricks Plugins For Claude Code
+# Wordbricks Plugins And Skills
 
-This repository is the Wordbricks Claude Code marketplace.
+This repository contains the Wordbricks Claude Code marketplace plugins plus standalone skills.
 
 ## Available Plugins
 
@@ -10,6 +10,11 @@ This repository is the Wordbricks Claude Code marketplace.
 - [`velen`](./plugins/velen/README.md): Use the Velen CLI from Claude Code for
   authenticated org discovery, insight inspection, and read-only Velen-managed
   data access.
+
+## Available Skills
+
+- [`onequery-cli`](./skills/onequery-cli/SKILL.md)
+- [`velen-cli`](./skills/velen-cli/SKILL.md)
 
 ## Installation
 
