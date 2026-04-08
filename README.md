@@ -1,8 +1,15 @@
 # Wordbricks Plugins For Claude Code
 
-This repository is a Claude Code marketplace containing the `velen` plugin.
+This repository is the Wordbricks Claude Code marketplace.
 
-Comment: the Velen CLI now ships its own embedded skill metadata through `velen schema skills`, while this repo packages a separately maintained Claude plugin. Keep the examples here aligned with the live CLI contract rather than assuming the two stay in sync automatically.
+## Available Plugins
+
+- [`onequery`](./plugins/onequery/README.md): Use the OneQuery CLI from Claude
+  Code for authenticated org discovery, source inspection, and read-only query
+  workflows.
+- [`velen`](./plugins/velen/README.md): Use the Velen CLI from Claude Code for
+  authenticated org discovery, insight inspection, and read-only Velen-managed
+  data access.
 
 ## Installation
 
@@ -14,41 +21,25 @@ Add this marketplace to Claude Code:
 /plugin marketplace add wordbricks/skills
 ```
 
-### Install the `velen` plugin
+### Browse or install a plugin
 
 After adding the marketplace:
 
 ```bash
-/plugin install velen@wordbricks
-```
-
-Or browse interactively:
-
-```bash
 /plugin
+/plugin install <plugin>@wordbricks
 ```
 
-### Local development
+See each plugin README for exact install commands, usage, local development,
+and team configuration:
 
-Load the plugin directly from this checkout:
-
-```bash
-claude --plugin-dir /Users/starush/work/skills/plugins/velen
-```
-
-## Usage
-
-Invoke the plugin skill with:
-
-```text
-/velen:ask
-```
-
-Use it to authenticate with the Velen CLI, resolve org and source context, inspect published insights, and run bounded read-only queries through Velen-managed access.
+- [`plugins/onequery/README.md`](./plugins/onequery/README.md)
+- [`plugins/velen/README.md`](./plugins/velen/README.md)
 
 ### Team installation
 
-For team-wide plugin usage, add this to your project's `.claude/settings.json`:
+For team-wide marketplace availability, add this to your project's
+`.claude/settings.json`:
 
 ```json
 {
@@ -59,17 +50,9 @@ For team-wide plugin usage, add this to your project's `.claude/settings.json`:
         "repo": "wordbricks/skills"
       }
     }
-  },
-  "enabledPlugins": {
-    "velen@wordbricks": true
   }
 }
 ```
 
-Team members will be prompted to install the plugin when they trust the repository.
-
-## Structure
-
-- Marketplace metadata: `.claude-plugin/marketplace.json`
-- Plugin root: `plugins/velen`
-- Skill path: `plugins/velen/skills/ask`
+Then enable the specific plugin entries you want from the matching plugin
+README.

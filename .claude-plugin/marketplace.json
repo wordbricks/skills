@@ -6,6 +6,11 @@
   },
   "plugins": [
     {
+      "name": "onequery",
+      "source": "./plugins/onequery",
+      "description": "Claude Code plugin for OneQuery CLI workflows, source inspection, and read-only query execution."
+    },
+    {
       "name": "velen",
       "source": "./plugins/velen",
       "description": "Claude Code plugin for Velen CLI workflows and read-only Velen-managed data access."
