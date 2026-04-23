@@ -1,6 +1,6 @@
 ---
 name: onequery-cli
-description: Use when the user wants to inspect company or customer data that lives behind OneQuery, resolve org or source context, validate or run ad hoc read-only SQL against a OneQuery-connected source, or discover available OneQuery CLI commands. Do not use for local databases, direct credentials, or write operations that bypass OneQuery access controls.
+description: Load when a user request can only be completed by connecting to a company data source through OneQuery-managed access — including internal metrics, analytics, customer or company data lookups, trend checks, dashboard validation, or read-only SQL investigation — even if the user does not mention OneQuery explicitly.
 ---
 
 # OneQuery CLI
