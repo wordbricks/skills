@@ -1,6 +1,6 @@
 {
   "name": "velen",
-  "description": "Claude Code plugin for Velen CLI workflows and read-only Velen-managed data access.",
+  "description": "Claude Code plugin for Velen CLI workflows, read-only Velen-managed data access, and org-scoped Knowledge Graph memory.",
   "version": "0.1.0",
   "author": {
     "name": "Wordbricks",
@@ -13,6 +13,7 @@
     "analytics",
     "data",
     "insights",
+    "knowledge-graph",
     "cli"
   ]
 }
