@@ -41,6 +41,14 @@ and team configuration:
 - [`plugins/onequery/README.md`](./plugins/onequery/README.md)
 - [`plugins/velen/README.md`](./plugins/velen/README.md)
 
+### Install a standalone skill
+
+Install the Velen CLI skill with the Skills CLI:
+
+```bash
+npx skills add wordbricks/skills --skill velen-cli
+```
+
 ### Team installation
 
 For team-wide marketplace availability, add this to your project's
