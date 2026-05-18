@@ -127,13 +127,18 @@ Knowledge Graph memory management, plus CLI discovery.
 2. List existing datasets with `velen --org <slug> memory dataset list`.
 3. Create a focused dataset when needed:
    `velen --org <slug> memory dataset create <dataset_key> --name <name> --description <description>`.
-4. Store reviewed text memory with `velen --org <slug> memory remember --dataset <dataset_key> --text <text>`, `--file <path>`, or `--stdin`.
-5. Use stable `--file-name` values so later runs can identify the memory item provenance.
-6. Recall before and after writes with `velen --org <slug> memory recall --dataset <dataset_key> --query <query> --top-k <n>`.
-7. Prefer separate datasets for domains such as `warehouse`, `metrics`,
+4. Rename the human-readable dataset label when the scope remains the same:
+   `velen --org <slug> memory dataset rename <dataset_key> --name <name>`.
+5. Delete a dataset only when the user explicitly asks to remove that org-scoped
+   Knowledge Graph memory:
+   `velen --org <slug> memory dataset delete <dataset_key>`.
+6. Store reviewed text memory with `velen --org <slug> memory remember --dataset <dataset_key> --text <text>`, `--file <path>`, or `--stdin`.
+7. Use stable `--file-name` values so later runs can identify the memory item provenance.
+8. Recall before and after writes with `velen --org <slug> memory recall --dataset <dataset_key> --query <query> --top-k <n>`.
+9. Prefer separate datasets for domains such as `warehouse`, `metrics`,
    `customers`, `business-rules`, or `incidents` instead of putting all memory
    into `manual`.
-8. If `memory graph upsert` is available, use stable canonical node ids, include
+10. If `memory graph upsert` is available, use stable canonical node ids, include
    every edge endpoint in the same request, and attach provenance. Typical node
    kinds are `DataSource`, `DataAsset`, `Field`, `Metric`, `BusinessConcept`,
    and `AnalysisRule`; typical edge types include `belongs_to`, `derived_from`,

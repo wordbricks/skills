@@ -13,10 +13,14 @@ velen query execute --help
 velen query validate --help
 velen memory --help
 velen memory dataset --help
+velen memory dataset rename --help
+velen memory dataset delete --help
 velen memory remember --help
 velen memory recall --help
 velen schema commands --output json
 velen schema command query execute --output json
+velen schema command memory dataset rename --output json
+velen schema command memory dataset delete --output json
 velen schema command memory recall --output json
 ```
 
@@ -144,11 +148,17 @@ discover visible insights before falling back to source queries.
 velen --org acme memory status
 velen --org acme memory dataset list
 velen --org acme memory dataset create warehouse --name "Warehouse Knowledge" --description "Tables, fields, joins, metric definitions, and analysis caveats for warehouse questions"
+velen --org acme memory dataset rename warehouse --name "Warehouse Knowledge Base"
+velen --org acme memory dataset delete stale-notes
 ```
 
 Use focused dataset keys such as `warehouse`, `metrics`, `customers`,
 `business-rules`, or `incidents`. Prefer `--org <slug>` instead of relying on
 persisted org state.
+
+Use `memory dataset rename` for human-readable label changes when the dataset
+key and scope are still correct. Use `memory dataset delete` only when the user
+explicitly asks to remove that org-scoped Knowledge Graph dataset.
 
 ## Remember Curated Knowledge
 
