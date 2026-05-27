@@ -1,7 +1,8 @@
 # Command Patterns
 
 Use these sequences when the user asks to query company data, inspect a
-source, investigate a known insight, or discover the Velen CLI surface.
+source, explicitly investigate a past insight, or discover the Velen CLI
+surface.
 
 ## Discover The CLI Surface
 
@@ -131,16 +132,20 @@ Use `--org <slug>` for one-off checks. Use `velen org use <slug>` only when the 
 - Prefer exact source-key or source-name matches first, then obvious prefix matches.
 - If multiple queryable sources still fit, report the ambiguity before querying.
 
-## Investigate A Known Insight
+## Investigate An Explicitly Requested Past Insight
 
 ```bash
 velen --org acme insight list
 velen --org acme insight get ACME-13
 ```
 
-Use the returned references and body to decide whether you need follow-up
-queries. If the public ID is unknown, use `insight list` in the target org to
-discover visible insights before falling back to source queries.
+Only use this pattern when the user directly asks to inspect past insights,
+provides a public insight ID, or asks to verify or extend a specific existing
+insight. Do not use `insight list` or `insight get` as a default discovery step
+for new analysis. Use the returned references and body to decide whether you
+need follow-up queries. If the user explicitly asks for past insight lookup but
+the public ID is unknown, use `insight list` in the target org to discover
+visible insights before falling back to source queries.
 
 ## Manage Knowledge Graph Memory
 

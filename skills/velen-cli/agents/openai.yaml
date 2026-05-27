@@ -1,4 +1,4 @@
 interface:
   display_name: "Velen CLI"
   short_description: "Inspect Velen-connected data and KG memory"
-  default_prompt: "Use $velen-cli to inspect Velen-connected company data, choose the right org and source, manage org-scoped Knowledge Graph memory when requested, run bounded read-only queries, review analytical drafts with `velen review` before final answers, and summarize the evidence."
+  default_prompt: "Use $velen-cli to inspect Velen-connected company data, choose the right org and source, avoid past insight lookup unless explicitly requested, manage org-scoped Knowledge Graph memory when requested, run bounded read-only queries, review analytical drafts with `velen review` before final answers, and summarize the evidence."
