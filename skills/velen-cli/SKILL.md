@@ -39,8 +39,8 @@ Knowledge Graph memory management, plus CLI discovery.
   past insight lookup as a default discovery step for new analysis.
 - When a Velen-backed task produces analysis, an insight, an interpretation, or
   a recommendation for the user, run the draft through `velen review` at least
-  once before returning the final answer. Treat this as a required quality gate,
-  not an optional polish step.
+  once before any user-facing answer. Treat this as a required quality gate,
+  not an optional polish step. Do not answer first and review afterward.
 - For every user request handled with Velen, search Knowledge Graph memory at
   least once after resolving org context and before relying on source schemas,
   insights, or SQL results. Use it to discover metric definitions, attribution
@@ -161,7 +161,9 @@ Knowledge Graph memory management, plus CLI discovery.
    output passthrough with no analysis.
 2. Write a concise draft answer that includes the main claims, evidence, caveats,
    and proposed next action.
-3. Run `velen review` on that draft before answering the user:
+3. Run `velen review` on that draft before answering the user. Every
+   analytical Velen-backed response must have at least one completed review
+   command in the current turn before the final answer:
    `velen review --file <draft.md>` or
    `printf '%s' "$DRAFT" | velen review --stdin`.
 4. Treat the review output as a Sophia-style critique. If it points out missing
