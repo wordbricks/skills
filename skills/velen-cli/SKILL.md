@@ -46,9 +46,10 @@ CLI discovery.
   lookup, or asks to verify or extend a specific existing insight. Do not use
   past insight lookup as a default discovery step for new analysis.
 - When a Velen-backed task produces analysis, an insight, an interpretation, or
-  a recommendation for the user, run the draft through `velen review` at least
-  once before any user-facing answer. Treat this as a required quality gate,
-  not an optional polish step. Do not answer first and review afterward.
+  a recommendation for the user, run the draft through
+  `velen review --persona sophia` at least once before any user-facing answer.
+  Treat this as a required quality gate, not an optional polish step. Do not
+  answer first and review afterward.
 - For every user request handled with Velen, search Knowledge Graph memory at
   least once after resolving org context and before relying on source schemas,
   insights, or SQL results. Use it to discover metric definitions, attribution
@@ -192,19 +193,19 @@ CLI discovery.
    output passthrough with no analysis.
 2. Write a concise draft answer that includes the main claims, evidence, caveats,
    and proposed next action.
-3. Run `velen review` on that draft before answering the user. Every
+3. Run `velen review --persona sophia` on that draft before answering the user. Every
    analytical Velen-backed response must have at least one completed review
    command in the current turn before the final answer:
-   `velen review --file <draft.md>` or
-   `printf '%s' "$DRAFT" | velen review --stdin`.
+   `velen review --persona sophia --file <draft.md>` or
+   `printf '%s' "$DRAFT" | velen review --persona sophia --stdin`.
 4. Treat the review output as a Sophia-style critique. If it points out missing
    data that Velen can access, run the smallest additional recall/query/check
    needed, update the draft, and use the corrected version as the final basis.
 5. Do not paste the review wholesale unless the user asks for it. Integrate the
    high-confidence corrections into the final answer and mention that the review
    command was run.
-6. If `velen review` fails because of auth or transport, attempt the smallest
-   normal recovery once. If it still fails, do not hide the failure; include the
+6. For auth or transport failures, attempt the smallest normal recovery once.
+   If it still fails, do not hide the failure; include the
    command path, error, and Request ID when available in the final summary.
 
 ### Step 8: Summarize evidence and next action
@@ -212,8 +213,8 @@ CLI discovery.
 1. Report the org, source, and exact command path, query, or insight used.
 2. Report the Knowledge Graph dataset key(s), recall query, and whether relevant
    metric rules or caveats were applied.
-3. Report that `velen review` was run for analytical outputs, or explain why it
-   was not applicable or could not complete.
+3. Report that `velen review --persona sophia` was run for analytical outputs,
+   or explain why it was not applicable or could not complete.
 4. Call out any ambiguity in source choice, org context, dataset choice, or
    missing insight ID.
 5. Include `Request ID` when available.

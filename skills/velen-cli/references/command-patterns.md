@@ -13,6 +13,7 @@ velen source --help
 velen source connect --help
 velen api --help
 velen use --help
+velen review --help
 velen query execute --help
 velen query validate --help
 velen update --help
@@ -39,6 +40,8 @@ velen schema command memory recall --output json
 Use these when command shape, read controls, or packaged guardrails are
 unclear. Start with top-level help or `schema commands`, then inspect the
 narrowest subcommand before guessing flags.
+
+For insight review, use `velen review --persona <PERSONA_KEY>` explicitly.
 
 ## Establish Context
 
@@ -316,6 +319,15 @@ Use persona commands only when the user explicitly asks to inspect or manage
 DB-backed persona profiles or durable persona memory. Use `--user-scoped` when
 the requested memory should apply only to the current CLI user rather than the
 org-wide persona.
+
+## Review Draft Analysis
+
+```bash
+velen review --persona sophia --file ./draft-insight.md
+cat ./draft-insight.md | velen review --persona sophia --stdin
+```
+
+Use `--persona sophia` explicitly.
 
 ## Update The CLI Or Agent Skill
 
