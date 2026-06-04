@@ -10,18 +10,29 @@ surface.
 velen --help
 velen org --help
 velen source --help
+velen source connect --help
+velen api --help
+velen use --help
 velen query execute --help
 velen query validate --help
+velen update --help
+velen skill update --help
 velen memory --help
 velen memory dataset --help
+velen memory dataset describe --help
 velen memory dataset rename --help
 velen memory dataset delete --help
+velen memory persona --help
+velen memory persona profile list --help
 velen memory remember --help
 velen memory recall --help
 velen schema commands --output json
+velen schema skills --output json
 velen schema command query execute --output json
+velen schema command update --output json
 velen schema command memory dataset rename --output json
 velen schema command memory dataset delete --output json
+velen schema command memory persona profile list --output json
 velen schema command memory recall --output json
 ```
 
@@ -34,6 +45,7 @@ narrowest subcommand before guessing flags.
 ```bash
 command -v velen
 velen auth whoami
+velen profile list
 velen org current
 velen org list
 velen org use acme
@@ -51,17 +63,21 @@ Interpretation:
 
 ```bash
 velen --org acme source list
-velen --org acme source show warehouse
+velen --org acme source show postgres://warehouse
 ```
 
-Use the source list to pick a source where `QUERY` is `yes`. Use `source show`
-to confirm the canonical `source_key`, provider, status, org, and query support
-before writing SQL.
+Use the source list to pick a source where `QUERY` is `yes` for SQL work, or
+the matching provider/source reference for source API work. Use `source show`
+to confirm the provider-qualified source reference, provider, status, org, query
+support, and sample query or source identity before writing SQL or calling
+`velen api`. Pass that
+`<provider>://<source-key>` reference to `source show`, `query`, and `api`
+commands.
 
 ## Validate Query Shape Before Execution
 
 ```bash
-velen --org acme query validate --source warehouse --sql "select 1"
+velen --org acme query validate --source postgres://warehouse --sql "select 1"
 ```
 
 Use `query validate` first when the SQL is unfamiliar, the provider dialect is
@@ -70,7 +86,7 @@ uncertain, or you want a cheap syntax and access check before execution.
 ## Run A Short Validation Query
 
 ```bash
-velen --org acme query execute --source warehouse --sql "select 1" --max-rows 10
+velen --org acme query execute --source postgres://warehouse --sql "select 1" --max-rows 10
 ```
 
 Use this first when you want to verify auth, org, source selection, and queryability without spending time on a large query.
@@ -78,7 +94,7 @@ Use this first when you want to verify auth, org, source selection, and queryabi
 ## Run A Real Analysis Query
 
 ```bash
-velen --org acme query execute --source warehouse --sql "select date_trunc('day', created_at) as day, count(*) as signups from users where created_at >= current_date - interval '7 days' group by 1 order by 1 desc" --max-rows 200 --max-bytes 50000 --cell-max-chars 500
+velen --org acme query execute --source postgres://warehouse --sql "select date_trunc('day', created_at) as day, count(*) as signups from users where created_at >= current_date - interval '7 days' group by 1 order by 1 desc" --max-rows 200 --max-bytes 50000 --cell-max-chars 500
 ```
 
 Guidance:
@@ -87,7 +103,7 @@ Guidance:
 - Add `limit` where it makes sense.
 - Start with aggregate checks before wide row dumps or heavy joins.
 - Tailor SQL dialect to the provider shown by
-  `velen --org <slug> source show`.
+  `velen --org <slug> source show <provider://source-key>`.
 - Use `--page-size`, `--max-rows`, `--max-bytes`, and `--cell-max-chars` when
   tighter read bounds materially reduce payload size.
 - Use `--request-id <id>` when you want stable trace correlation across
@@ -96,19 +112,48 @@ Guidance:
 ## Use File Or Stdin For Longer SQL
 
 ```bash
-velen --org acme query validate --source warehouse --file ./analysis.sql
-velen --org acme query execute --source warehouse --file ./analysis.sql --max-rows 200
-cat ./analysis.sql | velen --org acme query execute --source warehouse --stdin
+velen --org acme query validate --source postgres://warehouse --file ./analysis.sql
+velen --org acme query execute --source postgres://warehouse --file ./analysis.sql --max-rows 200
+cat ./analysis.sql | velen --org acme query execute --source postgres://warehouse --stdin
 ```
 
 Prefer `--file` or `--stdin` for multi-line SQL so the query can be inspected, revised, and rerun cleanly.
+
+## Use Raw Query Payload Input
+
+```bash
+cat ./query-request.json | velen --org acme query execute --source postgres://warehouse --input -
+velen --org acme query validate --source postgres://warehouse --input ./query-request.json
+```
+
+Use `--input <path|->` when you need to send the full JSON query request body,
+including parameters or request fields that are awkward as convenience flags.
+Do not combine `--input` with `--sql`, `--file`, `--stdin`, `--max-rows`,
+`--max-bytes`, `--cell-max-chars`, or `--timeout-ms`.
+
+## Use A Non-SQL Source API
+
+```bash
+velen use --source slack
+velen --org acme api --source slack://workspace --dry-run
+velen --org acme api --source slack://workspace --op list_channels --paginate --max-pages 2 --output json
+```
+
+Use `velen use --source <provider>` to inspect provider-specific SDK guidance
+for non-SQL sources. Use `velen api` only through the Velen-managed source
+reference. Start with `--dry-run` when target inference, operation name,
+pagination, headers, method, or request body shape is uncertain. Keep operations
+read-only. Use `--input <JSON|PATH|->` for request bodies and
+`--paginate --max-pages <n>` for bounded pagination.
 
 ## Query Company Data
 
 - Resolve the org first, then inspect sources in that org.
 - Narrow source selection by the most relevant product name or provider before inspecting multiple candidates.
-- Confirm the source with `velen --org <slug> source show <source_key>`.
-- Start with a bounded aggregate or `select 1` before wider inspection.
+- Confirm the source with `velen --org <slug> source show <provider://source-key>`.
+- For SQL, start with a bounded aggregate or `select 1` before wider inspection.
+- For source API, start with `velen api --dry-run` before executing a paginated
+  or body-bearing request.
 
 ## Validate A Metric
 
@@ -120,7 +165,7 @@ Prefer `--file` or `--stdin` for multi-line SQL so the query can be inspected, r
 
 ```bash
 velen --org acme source list
-velen --org acme query execute --source warehouse --sql "select 1"
+velen --org acme query execute --source postgres://warehouse --sql "select 1"
 velen org use acme
 ```
 
@@ -128,8 +173,8 @@ Use `--org <slug>` for one-off checks. Use `velen org use <slug>` only when the 
 
 ## Resolve Informal Source Names
 
-- If the user gives a product name, environment, or nickname instead of a canonical source key, treat it as an alias to resolve.
-- Prefer exact source-key or source-name matches first, then obvious prefix matches.
+- If the user gives a product name, environment, or nickname instead of a canonical provider-qualified source reference, treat it as an alias to resolve.
+- Prefer exact source-reference, source-key, or source-name matches first, then obvious prefix matches.
 - If multiple queryable sources still fit, report the ambiguity before querying.
 
 ## Investigate An Explicitly Requested Past Insight
@@ -153,6 +198,7 @@ visible insights before falling back to source queries.
 velen --org acme memory status
 velen --org acme memory dataset list
 velen --org acme memory dataset create warehouse --name "Warehouse Knowledge" --description "Tables, fields, joins, metric definitions, and analysis caveats for warehouse questions"
+velen --org acme memory dataset describe warehouse
 velen --org acme memory dataset rename warehouse --name "Warehouse Knowledge Base"
 velen --org acme memory dataset delete stale-notes
 ```
@@ -257,6 +303,34 @@ Use `DataSource`, `DataAsset`, `Field`, `Metric`, `BusinessConcept`, and
 `AnalysisRule` as common node kinds. Use relation types such as `belongs_to`,
 `derived_from`, `applies_to`, `warns_against`, and `recommends`.
 
+## Manage Persona Memory
+
+```bash
+velen --org acme memory persona profile list
+velen --org acme memory persona profile upsert sophia --file ./personas/sophia.profile.json --display-name "Sophia" --persona-version 2026-06
+velen --org acme memory persona remember sophia --kind style --title "Review tone" --summary "Prefer direct critique with concrete evidence and caveats." --confidence 0.9 --privacy internal
+velen --org acme memory persona consolidate sophia
+```
+
+Use persona commands only when the user explicitly asks to inspect or manage
+DB-backed persona profiles or durable persona memory. Use `--user-scoped` when
+the requested memory should apply only to the current CLI user rather than the
+org-wide persona.
+
+## Update The CLI Or Agent Skill
+
+```bash
+velen update --dry-run
+velen update
+velen update --package-manager npm
+velen skill update --dry-run
+velen skill update
+```
+
+`velen update` updates the globally installed `@wordbricks/velen` binary first
+and then installs or updates the packaged `velen-cli` agent skill from
+`wordbricks/skills`. Use `skill update` when only the skill should be refreshed.
+
 ## Common Recovery Moves
 
 ```bash
@@ -264,7 +338,7 @@ velen auth login
 velen auth import --input ./session.json
 velen org list
 velen --org acme source list
-velen --org acme source show warehouse
+velen --org acme source show postgres://warehouse
 velen --org acme memory status
 velen --org acme memory dataset list
 velen query execute --help

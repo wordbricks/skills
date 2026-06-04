@@ -13,11 +13,14 @@ This leaf skill extends the main `SKILL.md` in this directory.
 - Command-only discovery can run before auth.
 - Use `velen --help` and `velen <command> --help` for human-readable command discovery.
 - Prefer `velen schema commands --output json` when you need command capabilities.
+- Use `velen schema skills --output json` when you need packaged skill metadata.
 - Resolve org and source ambiguity before moving on to query execution.
+- Sources used by `source show`, `query`, and `api` must be
+  provider-qualified, for example `postgres://warehouse`.
 
 ## Workflow
 
 1. For command discovery, start with help or schema commands before auth.
 2. For protected data discovery, confirm auth and org context.
-3. Use `velen org current`, `velen org list`, `velen --org <slug> source list`, and `velen --org <slug> source show` to narrow the target.
+3. Use `velen org current`, `velen org list`, `velen --org <slug> source list`, and `velen --org <slug> source show <provider://source-key>` to narrow the target.
 4. Use `velen schema command <path> --output json` when you need the exact current command contract.

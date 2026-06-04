@@ -1,4 +1,4 @@
 interface:
   display_name: "Velen CLI"
-  short_description: "Inspect Velen-connected data and KG memory"
-  default_prompt: "Use $ask to resolve org and source context, prefer --org <slug>, inspect Velen-connected data, avoid past insight lookup unless explicitly requested, manage org-scoped Knowledge Graph memory when requested, run bounded read-only query validate or execute flows, review analytical drafts with `velen review` before final answers, and summarize the evidence."
+  short_description: "Inspect Velen data, memory, and CLI state"
+  default_prompt: "Use $ask to resolve org and provider-qualified source context, prefer --org <slug>, inspect Velen-connected data, avoid past insight lookup unless explicitly requested, manage org-scoped Knowledge Graph or persona memory when requested, run bounded read-only query validate, query execute, or source API flows, update the CLI/agent skill when asked, review analytical drafts with `velen review` before final answers, and summarize the evidence."
