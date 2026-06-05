@@ -49,6 +49,13 @@ CLI discovery.
   a recommendation for the user, run the draft through `velen review` at least
   once before returning the final answer. Treat this as a required quality gate,
   not an optional polish step.
+- For product analytics, growth, funnel, KPI, or conversion work, do not accept
+  a tracked event name as the KPI until you verify what the event actually
+  represents. Distinguish raw UI intent, auth gates, validation/file upload,
+  request sent, success, error, retention, revenue, and other downstream value.
+  If the current instrumentation cannot support the KPI cleanly, make the
+  smallest measurement fix an explicit action item before listing product
+  optimization ideas.
 - For Knowledge Graph memory writes, only store concise, verified facts,
   provenance, schema notes, metric definitions, caveats, or explicit node/edge
   payloads that the user asked to persist.
@@ -112,7 +119,32 @@ CLI discovery.
    provider/source reference.
 7. Run `velen --org <slug> source show <provider://source-key>` to confirm provider, org, status, and query support or source identity before writing SQL or calling `velen api`.
 
-### Step 4: Run the smallest useful operation
+### Step 4: Define metric semantics for KPI and product analytics
+
+Use this step when the user asks to improve, optimize, increase, diagnose, or
+define a KPI, conversion metric, funnel, activation metric, feature usage
+metric, or growth lever.
+
+1. State the decision metric in behavioral terms before querying deeply. Example:
+   "successful generation attempts" is different from "generate button clicks."
+2. Verify what each candidate event means before treating it as the KPI. Use
+   Knowledge Graph memory, source metadata, event properties, and local code
+   when available to locate where the event is emitted and what happens before
+   or after it.
+3. Map the minimum funnel needed for the decision, such as
+   view -> click -> auth gate -> validation/upload -> request sent -> success/error.
+4. Identify proxy-metric risk explicitly: raw click, page view, modal open, or
+   other top-of-funnel events can be useful diagnostics but may be misleading
+   primary KPIs if they fire before the value-creating action.
+5. If the funnel lacks a required event or property, propose the smallest
+   instrumentation action item in the recommendation. Prefer additive events or
+   properties that preserve existing dashboards, such as adding
+   `feature_request_sent` between `feature_click` and `feature_success`.
+6. Define primary KPI, secondary KPI, and guardrail before proposing product
+   changes. Product recommendations should target the bottleneck surfaced by
+   those metrics, not just the event the user named.
+
+### Step 5: Run the smallest useful operation
 
 1. For unfamiliar SQL, start with `velen --org <slug> query validate --source <provider://source-key> ...`.
 2. For execution, start with a cheap query such as `select 1`, a row count, or a bounded aggregate via `velen --org <slug> query execute --source <provider://source-key> ...`.
@@ -135,7 +167,7 @@ CLI discovery.
    `velen memory graph upsert --help` or
    `velen schema command memory graph upsert --output json` before use.
 
-### Step 5: Manage Knowledge Graph memory
+### Step 6: Manage Knowledge Graph memory
 
 1. Check Cognee availability with `velen --org <slug> memory status`.
 2. List existing datasets with `velen --org <slug> memory dataset list`.
@@ -165,7 +197,7 @@ CLI discovery.
    `memory persona consolidate` only for the persona key and scope the user
    asked to change.
 
-### Step 6: Review draft analysis
+### Step 7: Review draft analysis
 
 1. This step is required whenever the work produces an analytical conclusion,
    insight, recommendation, score, or executive-facing summary from Velen data.
@@ -173,6 +205,10 @@ CLI discovery.
    output passthrough with no analysis.
 2. Write a concise draft answer that includes the main claims, evidence, caveats,
    and proposed next action.
+   For KPI/product analytics work, the draft must include any event/KPI
+   semantic mismatch and the smallest instrumentation change needed to make the
+   KPI reliable. Ask the review to critique whether the KPI can be gamed or is
+   only a proxy for downstream value.
 3. Run `velen review` on that draft before answering the user:
    `velen review --file <draft.md>` or
    `printf '%s' "$DRAFT" | velen review --stdin`.
@@ -186,7 +222,7 @@ CLI discovery.
    normal recovery once. If it still fails, do not hide the failure; include the
    command path, error, and Request ID when available in the final summary.
 
-### Step 7: Summarize evidence and next action
+### Step 8: Summarize evidence and next action
 
 1. Report the org, source, and exact command path, query, or insight used.
 2. For Knowledge Graph memory work, report the dataset key, file name, and
@@ -195,8 +231,10 @@ CLI discovery.
    was not applicable or could not complete.
 4. Call out any ambiguity in source choice, org context, dataset choice, or
    missing insight ID.
-5. Include `Request ID` when available.
-6. If more evidence is needed, propose the next smallest follow-up query or
+5. For KPI/product analytics work, report the recommended primary KPI,
+   secondary KPI, guardrail, and any required instrumentation action item.
+6. Include `Request ID` when available.
+7. If more evidence is needed, propose the next smallest follow-up query or
    recall check.
 
 ## Failure Handling

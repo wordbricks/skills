@@ -164,6 +164,24 @@ read-only. Use `--input <JSON|PATH|->` for request bodies and
 - Add explicit date bounds before expanding the query.
 - Prefer follow-up breakdowns only after the base aggregate looks correct.
 
+## Analyze Product KPIs And Funnels
+
+- Translate the user's named metric into the behavior the business actually
+  wants before querying deeply. A button click can be raw intent, while a
+  request-sent or success event may be the meaningful attempt.
+- Verify event semantics from event properties, source metadata, Knowledge Graph
+  memory, and local code when available. Locate where the event fires and what
+  can happen before or after it.
+- Map the minimum funnel needed for the decision, for example:
+  `view -> click -> auth gate -> validation/upload -> request sent -> success/error`.
+- If the current events cannot distinguish proxy intent from downstream value,
+  recommend the smallest additive instrumentation fix as an action item before
+  product optimization ideas. Example: keep `generate_click`, add
+  `generate_request_sent`, and use `generate_success / generate_request_sent`
+  as a guardrail.
+- Report primary KPI, secondary KPI, and guardrail separately so raw event
+  growth cannot be mistaken for actual improvement.
+
 ## Work Across Orgs
 
 ```bash
