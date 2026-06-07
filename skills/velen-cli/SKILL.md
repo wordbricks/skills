@@ -47,7 +47,7 @@ CLI discovery.
   past insight lookup as a default discovery step for new analysis.
 - When a Velen-backed task produces analysis, an insight, an interpretation, or
   a recommendation for the user, run the draft through
-  `velen review --persona sophia` at least once before any user-facing answer.
+  `velen persona chat sophia` at least once before any user-facing answer.
   Treat this as a required quality gate, not an optional polish step. Do not
   answer first and review afterward.
 - For product analytics, growth, funnel, KPI, or conversion work, do not accept
@@ -227,19 +227,20 @@ metric, or growth lever.
    and proposed next action.
    For KPI/product analytics work, the draft must include any event/KPI
    semantic mismatch and the smallest instrumentation change needed to make the
-   KPI reliable. Ask the review to critique whether the KPI can be gamed or is
-   only a proxy for downstream value.
-3. Run `velen review --persona sophia` on that draft before answering the user. Every
-   analytical Velen-backed response must have at least one completed review
-   command in the current turn before the final answer:
-   `velen review --persona sophia --file <draft.md>` or
-   `printf '%s' "$DRAFT" | velen review --persona sophia --stdin`.
-4. Treat the review output as a Sophia-style critique. If it points out missing
-   data that Velen can access, run the smallest additional recall/query/check
-   needed, update the draft, and use the corrected version as the final basis.
+   KPI reliable. Ask Sophia to critique whether the KPI can be gamed or is only
+   a proxy for downstream value.
+3. Ask Sophia to review that draft with an explicit review instruction before
+   answering the user. Every analytical Velen-backed response must have at
+   least one completed persona chat review in the current turn before the final
+   answer:
+   `printf '다음 분석 초안을 리뷰해줘. 근거, 누락, 과장, 실행 가능성을 비판적으로 봐줘.\n\n%s' "$DRAFT" | velen persona chat sophia --stdin`.
+4. Treat the persona chat output as a Sophia-style critique. If it points out
+   missing data that Velen can access, run the smallest additional
+   recall/query/check needed, update the draft, and use the corrected version as
+   the final basis.
 5. Do not paste the review wholesale unless the user asks for it. Integrate the
-   high-confidence corrections into the final answer and mention that the review
-   command was run.
+   high-confidence corrections into the final answer and mention that the
+   persona chat review was run.
 6. For auth or transport failures, attempt the smallest normal recovery once.
    If it still fails, do not hide the failure; include the
    command path, error, and Request ID when available in the final summary.
@@ -249,7 +250,7 @@ metric, or growth lever.
 1. Report the org, source, and exact command path, query, or insight used.
 2. Report the Knowledge Graph dataset key(s), recall query, and whether relevant
    metric rules or caveats were applied.
-3. Report that `velen review --persona sophia` was run for analytical outputs,
+3. Report that `velen persona chat sophia` was run for analytical outputs,
    or explain why it was not applicable or could not complete.
 4. Call out any ambiguity in source choice, org context, dataset choice, or
    missing insight ID.

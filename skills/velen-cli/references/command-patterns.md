@@ -13,7 +13,7 @@ velen source --help
 velen source connect --help
 velen api --help
 velen use --help
-velen review --help
+velen persona chat --help
 velen query execute --help
 velen query validate --help
 velen update --help
@@ -41,7 +41,7 @@ Use these when command shape, read controls, or packaged guardrails are
 unclear. Start with top-level help or `schema commands`, then inspect the
 narrowest subcommand before guessing flags.
 
-For insight review, use `velen review --persona <PERSONA_KEY>` explicitly.
+For insight review, use `velen persona chat <PERSONA_KEY>` explicitly.
 
 ## Establish Context
 
@@ -341,11 +341,11 @@ org-wide persona.
 ## Review Draft Analysis
 
 ```bash
-velen review --persona sophia --file ./draft-insight.md
-cat ./draft-insight.md | velen review --persona sophia --stdin
+printf '다음 분석 초안을 리뷰해줘. 근거, 누락, 과장, 실행 가능성을 비판적으로 봐줘.\n\n%s' "$DRAFT" | velen persona chat sophia --stdin
+{ printf '다음 분석 초안을 리뷰해줘. 근거, 누락, 과장, 실행 가능성을 비판적으로 봐줘.\n\n'; cat ./draft-insight.md; } | velen persona chat sophia --stdin
 ```
 
-Use `--persona sophia` explicitly.
+Use Sophia explicitly unless the user asks for a different persona key.
 
 ## Update The CLI Or Agent Skill
 
