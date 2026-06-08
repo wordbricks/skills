@@ -16,7 +16,8 @@ CLI discovery.
 - Use it when the user wants company or customer data that is expected to be available through Velen, wants to validate a metric with ad hoc SQL or read-only source API access, explicitly asks to inspect a past Velen insight, asks to manage Velen memory, or asks to update the Velen CLI or packaged agent skill.
 - Do not use it for local databases, direct credentials, DDL, or product/documentation questions that do not require CLI access.
 - Treat remote writes as out of scope except for explicit user-requested
-  Knowledge Graph or persona memory operations exposed by `velen memory ...`.
+  Knowledge Graph operations exposed by `velen memory ...` or persona memory
+  operations exposed by `velen persona ...`.
 - Once org resolution is clear, prefer `--org <slug>` on org-scoped commands
   rather than relying on persisted local state.
 - Provider-specific sources are still in scope when Velen is the access path.
@@ -70,7 +71,7 @@ CLI discovery.
   provenance, schema notes, metric definitions, caveats, or explicit node/edge
   payloads that the user asked to persist.
 - Treat persona profile and persona memory commands as remote writes. Use
-  `memory persona ...` only when the user explicitly asks to inspect or manage
+  `velen persona ...` only when the user explicitly asks to inspect or manage
   persona profiles/memory.
 - Do not ingest raw broad query output, secrets, credentials, or unreviewed
   customer-sensitive dumps into Knowledge Graph memory.
@@ -85,8 +86,9 @@ CLI discovery.
   headless auth session (`VELEN_ACCESS_TOKEN` or `velen auth import --input <path|->`).
 - Install and login may require network access, permission to install global packages, and an interactive browser/device-code authorization step.
 - Data source query and source API tasks must stay read-only. Knowledge Graph
-  and persona memory tasks may write only through `velen memory ...` after the
-  user asks to manage or enrich memory.
+  tasks may write only through `velen memory ...`, and persona memory tasks may
+  write only through `velen persona ...`, after the user asks to manage or
+  enrich memory.
 
 ## Required Workflow
 
@@ -219,9 +221,9 @@ metric, or growth lever.
    and `AnalysisRule`; typical edge types include `belongs_to`, `derived_from`,
    `applies_to`, `warns_against`, and `recommends`.
 12. For explicit persona memory work, start with
-   `velen --org <slug> memory persona profile list`. Use
-   `memory persona profile upsert`, `memory persona remember`, or
-   `memory persona consolidate` only for the persona key and scope the user
+   `velen --org <slug> persona profile list`. Use
+   `velen persona profile upsert`, `velen persona remember`, or
+   `velen persona consolidate` only for the persona key and scope the user
    asked to change.
 
 ### Step 8: Review draft analysis

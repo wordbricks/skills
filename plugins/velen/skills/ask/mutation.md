@@ -24,6 +24,6 @@ This leaf skill extends the main `SKILL.md` in this directory.
 3. Use `velen --org <slug> memory dataset describe <dataset_key>` before risky dataset changes when the current scope is unclear.
 4. Use `velen --org <slug> memory dataset rename <dataset_key> --name <name>` for display-name changes.
 5. Use `velen --org <slug> memory dataset delete <dataset_key>` only after the user explicitly asks to remove that dataset.
-6. For explicit persona memory changes, inspect `velen memory persona --help` or the narrow schema command, then use the smallest matching command: `memory persona profile list`, `memory persona profile upsert`, `memory persona remember`, or `memory persona consolidate`.
+6. For explicit persona memory changes, inspect `velen persona --help` or the narrow schema command, then use the smallest matching command: `velen persona profile list`, `velen persona profile upsert`, `velen persona remember`, or `velen persona consolidate`.
 7. For local tool updates, `velen update` updates the binary first and then the packaged `velen-cli` skill; `--package-manager bun|npm` selects the binary installer.
 8. Report the resulting org, dataset key or persona key, local command path, and Request ID when available.

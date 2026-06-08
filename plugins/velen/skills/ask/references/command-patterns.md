@@ -13,6 +13,14 @@ velen source --help
 velen source connect --help
 velen api --help
 velen use --help
+velen persona --help
+velen persona chat --help
+velen persona profile --help
+velen persona profile list --help
+velen persona profile public list --help
+velen persona profile copy --help
+velen persona remember --help
+velen persona consolidate --help
 velen query execute --help
 velen query validate --help
 velen update --help
@@ -22,17 +30,20 @@ velen memory dataset --help
 velen memory dataset describe --help
 velen memory dataset rename --help
 velen memory dataset delete --help
-velen memory persona --help
-velen memory persona profile list --help
 velen memory remember --help
 velen memory recall --help
 velen schema commands --output json
 velen schema skills --output json
 velen schema command query execute --output json
 velen schema command update --output json
+velen schema command persona chat --output json
+velen schema command persona profile list --output json
+velen schema command persona profile public list --output json
+velen schema command persona profile copy --output json
+velen schema command persona remember --output json
+velen schema command persona consolidate --output json
 velen schema command memory dataset rename --output json
 velen schema command memory dataset delete --output json
-velen schema command memory persona profile list --output json
 velen schema command memory recall --output json
 ```
 
@@ -324,10 +335,12 @@ Use `DataSource`, `DataAsset`, `Field`, `Metric`, `BusinessConcept`, and
 ## Manage Persona Memory
 
 ```bash
-velen --org acme memory persona profile list
-velen --org acme memory persona profile upsert sophia --file ./personas/sophia.profile.json --display-name "Sophia" --persona-version 2026-06
-velen --org acme memory persona remember sophia --kind style --title "Review tone" --summary "Prefer direct critique with concrete evidence and caveats." --confidence 0.9 --privacy internal
-velen --org acme memory persona consolidate sophia
+velen --org acme persona profile list
+velen --org acme persona profile public list
+velen --org acme persona profile copy sophia
+velen --org acme persona profile upsert sophia --file ./personas/sophia.profile.json --display-name "Sophia" --persona-version 2026-06
+velen --org acme persona remember sophia --kind style --title "Review tone" --summary "Prefer direct critique with concrete evidence and caveats." --confidence 0.9 --privacy internal
+velen --org acme persona consolidate sophia
 ```
 
 Use persona commands only when the user explicitly asks to inspect or manage
