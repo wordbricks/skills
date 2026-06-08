@@ -23,7 +23,10 @@ This leaf skill extends the main `SKILL.md` in this directory.
 - Use `--max-rows`, `--max-bytes`, `--cell-max-chars`, and SQL filters to bound result size before widening reads.
 - Use `--input <path|->` only when sending a full JSON query request payload;
   do not combine it with SQL convenience flags or result-window flags.
-- Raise global `--timeout <sec>` or query `--timeout-ms <ms>` for a single slow run instead of editing persisted config.
+- Prefer the CLI's built-in 180-second request timeout. Omit global
+  `--timeout` for normal query work; use query `--timeout-ms <ms>` for a single
+  slow query result window, or global `--timeout <sec>` only as an explicit
+  invocation-specific override instead of editing persisted config.
 
 ## Workflow
 
