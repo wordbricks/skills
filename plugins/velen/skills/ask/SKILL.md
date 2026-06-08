@@ -52,7 +52,8 @@ CLI discovery.
   past insight lookup as a default discovery step for new analysis.
 - When a Velen-backed task produces analysis, an insight, an interpretation, or
   a recommendation for the user, run the draft through
-  `velen persona chat sophia` at least once before returning the final answer.
+  `velen persona chat sophia` until it returns a passing review before returning
+  the final answer.
   Treat this as a required quality gate, not an optional polish step.
 - For product analytics, growth, funnel, KPI, or conversion work, do not accept
   a tracked event name as the KPI until you verify what the event actually
@@ -218,12 +219,14 @@ metric, or growth lever.
    semantic mismatch and the smallest instrumentation change needed to make the
    KPI reliable. Ask Sophia to critique whether the KPI can be gamed or is only
    a proxy for downstream value.
-3. Ask Sophia to review that draft before answering the user:
-   `printf '다음 분석 초안을 리뷰해줘. 근거, 누락, 과장, 실행 가능성을 비판적으로 봐줘.\n\n%s' "$DRAFT" | velen persona chat sophia --stdin`.
-4. Treat the persona chat output as a Sophia-style critique. If it points out
-   missing data that Velen can access, run the smallest additional
-   recall/query/check needed, update the draft, and use the corrected version as
-   the final basis.
+3. Ask Sophia to review that draft before answering the user. Require both
+   review details and a clear pass/fail result:
+   `printf '다음 분석 초안을 리뷰해줘. 근거, 누락, 과장, 실행 가능성을 비판적으로 봐줘. 리뷰 내용과 함께 결과를 통과 또는 불통과로 명시해줘.\n\n%s' "$DRAFT" | velen persona chat sophia --stdin`.
+4. Treat the persona chat output as a Sophia-style critique. If it returns
+   불통과 or points out missing data that Velen can access, run the smallest
+   additional recall/query/check needed, revise the draft, and ask Sophia to
+   review the revised draft again. Repeat until Sophia returns 통과 or the review
+   cannot complete after the normal recovery path.
 5. Do not paste the review wholesale unless the user asks for it. Integrate the
    high-confidence corrections into the final answer and mention that the
    persona chat review was run.

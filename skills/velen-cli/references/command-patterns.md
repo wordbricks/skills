@@ -354,11 +354,13 @@ org-wide persona.
 ## Review Draft Analysis
 
 ```bash
-printf '다음 분석 초안을 리뷰해줘. 근거, 누락, 과장, 실행 가능성을 비판적으로 봐줘.\n\n%s' "$DRAFT" | velen persona chat sophia --stdin
-{ printf '다음 분석 초안을 리뷰해줘. 근거, 누락, 과장, 실행 가능성을 비판적으로 봐줘.\n\n'; cat ./draft-insight.md; } | velen persona chat sophia --stdin
+printf '다음 분석 초안을 리뷰해줘. 근거, 누락, 과장, 실행 가능성을 비판적으로 봐줘. 리뷰 내용과 함께 결과를 통과 또는 불통과로 명시해줘.\n\n%s' "$DRAFT" | velen persona chat sophia --stdin
+{ printf '다음 분석 초안을 리뷰해줘. 근거, 누락, 과장, 실행 가능성을 비판적으로 봐줘. 리뷰 내용과 함께 결과를 통과 또는 불통과로 명시해줘.\n\n'; cat ./draft-insight.md; } | velen persona chat sophia --stdin
 ```
 
-Use Sophia explicitly unless the user asks for a different persona key.
+Use Sophia explicitly unless the user asks for a different persona key. If the
+review returns 불통과, revise the draft and run the review again until it returns
+통과 or the review cannot complete after the normal recovery path.
 
 ## Update The CLI Or Agent Skill
 
