@@ -351,6 +351,18 @@ DB-backed persona profiles or durable persona memory. Use `--user-scoped` when
 the requested memory should apply only to the current CLI user rather than the
 org-wide persona.
 
+Keep persona profile and persona memory separate:
+
+- Profile: role, rules, capability/command contracts, output formats, modes,
+  trigger behavior, source provenance, and other design/specification details.
+- Persona memory: human-like beliefs, habits, preferences, experiences,
+  relationships, and durable context the persona would naturally remember.
+
+Before `persona remember`, apply the human-memory test: could the persona
+naturally say "I believe...", "I tend to...", "I remember...", or "I prefer..."
+about this? If not, do not store it as memory; put it in the profile JSON,
+source documentation, or a tool/command contract instead.
+
 ## Review Draft Analysis
 
 ```bash

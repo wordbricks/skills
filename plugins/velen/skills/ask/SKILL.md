@@ -68,6 +68,11 @@ CLI discovery.
 - Treat persona profile and persona memory commands as remote writes. Use
   `velen persona ...` only when the user explicitly asks to inspect or manage
   persona profiles/memory.
+- Persona memory must read like a person's memory: beliefs, habits,
+  preferences, experiences, relationships, or durable context the persona
+  would naturally remember. Put command contracts, tool instructions, output
+  formats, source docs, and capability specs in the persona profile or a source
+  document instead, not in durable persona memory.
 - Do not ingest raw broad query output, secrets, credentials, or unreviewed
   customer-sensitive dumps into Knowledge Graph memory.
 - Include `org`, `source`, `dataset`, and `Request ID` in the final summary
@@ -206,6 +211,14 @@ metric, or growth lever.
    `velen persona profile upsert`, `velen persona remember`, or
    `velen persona consolidate` only for the persona key and scope the user
    asked to change.
+13. Before `velen persona remember`, apply the human-memory test: could the
+    persona naturally say "I believe...", "I tend to...", "I remember...", or
+    "I prefer..." about this? If yes, store it as persona memory. If no, put it
+    in the profile JSON, source documentation, or tool/command contract instead.
+14. Keep persona memory concise and self-contained. Store only human-like
+    beliefs, habits, preferences, experiences, relationships, or durable context;
+    do not store raw manuals, command syntax, output templates, broad source
+    dumps, secrets, or customer-sensitive data as persona memory.
 
 ### Step 7: Review draft analysis
 
