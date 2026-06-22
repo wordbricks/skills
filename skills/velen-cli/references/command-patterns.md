@@ -20,6 +20,7 @@ velen persona profile list --help
 velen persona profile public list --help
 velen persona profile copy --help
 velen persona remember --help
+velen persona forget --help
 velen persona consolidate --help
 velen query execute --help
 velen query validate --help
@@ -41,6 +42,7 @@ velen schema command persona profile list --output json
 velen schema command persona profile public list --output json
 velen schema command persona profile copy --output json
 velen schema command persona remember --output json
+velen schema command persona forget --output json
 velen schema command persona consolidate --output json
 velen schema command memory dataset rename --output json
 velen schema command memory dataset delete --output json
@@ -343,13 +345,15 @@ velen --org acme persona profile public list
 velen --org acme persona profile copy sophia
 velen --org acme persona profile upsert sophia --file ./personas/sophia.profile.json --display-name "Sophia" --persona-version 2026-06
 velen --org acme persona remember sophia --kind style --title "Review tone" --summary "Prefer direct critique with concrete evidence and caveats." --confidence 0.9 --privacy internal
+velen --org acme persona forget sophia memory_123 --source-title "Obsolete review tone"
 velen --org acme persona consolidate sophia
 ```
 
 Use persona commands only when the user explicitly asks to inspect or manage
 DB-backed persona profiles or durable persona memory. Use `--user-scoped` when
 the requested memory should apply only to the current CLI user rather than the
-org-wide persona.
+org-wide persona. Use `persona forget`, not delete, when removing one durable
+persona memory by id.
 
 Keep persona profile and persona memory separate:
 

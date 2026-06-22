@@ -208,9 +208,10 @@ metric, or growth lever.
    `applies_to`, `warns_against`, and `recommends`.
 12. For explicit persona memory work, start with
    `velen --org <slug> persona profile list`. Use
-   `velen persona profile upsert`, `velen persona remember`, or
-   `velen persona consolidate` only for the persona key and scope the user
-   asked to change.
+   `velen persona profile upsert`, `velen persona remember`,
+   `velen persona forget`, or `velen persona consolidate` only for the persona
+   key and scope the user asked to change. Use `persona forget`, not delete,
+   for removing one durable persona memory.
 13. Before `velen persona remember`, apply the human-memory test: could the
     persona naturally say "I believe...", "I tend to...", "I remember...", or
     "I prefer..." about this? If yes, store it as persona memory. If no, put it
