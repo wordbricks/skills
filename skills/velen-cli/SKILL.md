@@ -186,8 +186,7 @@ metric, or growth lever.
 8. For Knowledge Graph memory enrichment, create or select a narrow dataset,
    persist curated facts with `velen --org <slug> memory remember ...`, and
    verify retrieval with `velen --org <slug> memory recall ...`.
-9. For a non-SQL source API task, inspect provider guidance with
-   `velen use --source <provider>` when needed, then use
+9. For a non-SQL source API task, use
    `velen --org <slug> api --source <provider://source-key> ...`. Start with
    `--dry-run` when operation inference, pagination, headers, or body shape is
    uncertain.

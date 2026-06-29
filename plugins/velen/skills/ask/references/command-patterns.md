@@ -12,7 +12,6 @@ velen org --help
 velen source --help
 velen source connect --help
 velen api --help
-velen use --help
 velen persona --help
 velen persona chat --help
 velen persona profile --help
@@ -147,16 +146,14 @@ Do not combine `--input` with `--sql`, `--file`, `--stdin`, `--max-rows`,
 ## Use A Non-SQL Source API
 
 ```bash
-velen use --source slack
 velen --org acme api --source slack://workspace --dry-run
 velen --org acme api --source slack://workspace --op list_channels --paginate --max-pages 2 --output json
 ```
 
-Use `velen use --source <provider>` to inspect provider-specific SDK guidance
-for non-SQL sources. Use `velen api` only through the Velen-managed source
-reference. Start with `--dry-run` when target inference, operation name,
-pagination, headers, method, or request body shape is uncertain. Keep operations
-read-only. Use `--input <JSON|PATH|->` for request bodies and
+Use `velen api` only through the Velen-managed source reference. Start with
+`--dry-run` when target inference, operation name, pagination, headers, method,
+or request body shape is uncertain. Keep operations read-only. Use
+`--input <JSON|PATH|->` for request bodies and
 `--paginate --max-pages <n>` for bounded pagination.
 
 ## Query Company Data
