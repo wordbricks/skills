@@ -1,4 +1,4 @@
 interface:
   display_name: "Velen CLI"
-  short_description: "Inspect Velen data, memory, and CLI state"
-  default_prompt: "Use $ask to resolve org and provider-qualified source context, prefer --org <slug>, inspect Velen-connected data, avoid past insight lookup unless explicitly requested, manage org-scoped Knowledge Graph or persona memory when requested, run bounded read-only query validate, query execute, or source API flows, update the CLI/agent skill when asked, and summarize the evidence."
+  short_description: "Use Velen data, sources, workers, memory, and CLI"
+  default_prompt: "Use $ask to resolve Velen profile, org, source, or worker context and run the smallest authorized query, source API action, connection, memory operation, or CLI management command."

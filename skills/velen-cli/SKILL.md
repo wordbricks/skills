@@ -1,6 +1,6 @@
 ---
 name: velen-cli
-description: Use when the user wants to inspect company or customer data behind Velen, configure CLI org selection or profiles, run ad hoc read-only SQL or source API calls, discover connected workers or send an explicit Hermes Agent request, inspect a requested past insight, manage org-scoped Knowledge Graph or persona memory, or update the Velen CLI/agent skill. Do not use for local databases, direct credentials, or SQL/API work that bypasses Velen access controls.
+description: Use when the user wants to inspect company or customer data behind Velen, configure CLI profiles or orgs, inspect or connect Velen-managed sources, run ad hoc read-only SQL or authorized source API actions, discover or call connected workers, inspect requested past insights, manage Knowledge Graph or persona memory, discover the CLI contract, or update the Velen CLI/agent skill. Do not use for local databases, direct credentials, or SQL/API work that bypasses Velen access controls.
 ---
 
 # Velen CLI
@@ -28,10 +28,10 @@ local CLI/skill updates, plus CLI discovery and local CLI configuration.
 - Use `velen --help`, `velen <command> --help`, `velen schema commands`, and
   `velen schema command <path>` for command discovery before guessing flags or
   subcommands.
-- Source selectors for `source show`, `query`, and `api` commands must be
-  provider-qualified references such as `postgres://warehouse` or
-  `slack://workspace`, not bare source keys. Use `source list` or the sample
-  query from `source show` to get the exact reference.
+- Use provider-qualified references such as `postgres://warehouse` or
+  `slack://workspace` for `source show` and `api`, and prefer them for `query`.
+  Query commands can resolve a bare source key only when it is unambiguous in
+  the selected org.
 - Connected workers such as Hermes are listed separately from passive sources.
   Use `velen --org <slug> workers list`, then pass the returned
   `hermes://<worker-key>` reference to `velen api`.
@@ -42,7 +42,9 @@ local CLI/skill updates, plus CLI discovery and local CLI configuration.
 - Prefer `--org <slug>` for investigations and one-off org-scoped commands.
   Rely on workspace or user-default config only when that persisted selection
   is intentional and confirmed with `velen org current`.
-- Bound reads aggressively before widening scope.
+- Bound reads aggressively before widening scope. For list reads, inspect the
+  command schema and use supported `--fields`, `--page-size`, and pagination
+  controls.
 - Use `--request-id <id>` when a multi-step investigation needs stable trace correlation.
 - Prefer the CLI's built-in 180-second request timeout. Omit `--timeout` for
   normal commands; pass `--timeout` only when the user explicitly asks for a
@@ -62,11 +64,11 @@ local CLI/skill updates, plus CLI discovery and local CLI configuration.
   If the current instrumentation cannot support the KPI cleanly, make the
   smallest measurement fix an explicit action item before listing product
   optimization ideas.
-- For every user request handled with Velen, search Knowledge Graph memory at
-  least once after resolving org context and before relying on source schemas,
-  insights, or SQL results. Use it to discover metric definitions, attribution
-  rules, caveats, known bad columns, preferred datasets, and prior verified
-  analysis rules.
+- For source-backed analysis, search Knowledge Graph memory after resolving org
+  context and before relying on source schemas, insights, or SQL results. Skip
+  memory access for auth, profile, org configuration, command/schema discovery,
+  source connection, CLI/skill updates, and other tasks that do not use company
+  data.
 - For Knowledge Graph memory writes, only store concise, verified facts,
   provenance, schema notes, metric definitions, caveats, or explicit node/edge
   payloads that the user asked to persist.
@@ -95,7 +97,9 @@ local CLI/skill updates, plus CLI discovery and local CLI configuration.
 
 ## Required Workflow
 
-**Follow these steps in order. Do not skip steps.**
+Route the request through only the applicable steps below. Run command/schema
+discovery before guessing flags. Do not require auth, org resolution, or memory
+access for an org-agnostic local or discovery task.
 
 ### Step 1: Confirm CLI availability and auth
 
@@ -109,27 +113,43 @@ local CLI/skill updates, plus CLI discovery and local CLI configuration.
    `velen schema commands --output json`, or
    `velen schema command <path> --output json` before doing anything
    auth-related.
-5. For protected workflows, run `velen auth whoami`.
-6. If auth is missing or expired, prefer an existing `VELEN_ACCESS_TOKEN` or `velen auth import --input <path|->` for automated runs.
-7. If no headless credential source is available, run `velen auth login` and complete browser authorization.
+5. Use `velen schema openapi --output json` when the HTTP contract itself is
+   needed. Do not rely on `velen schema skills`; current builds may return an
+   empty skill list because skills are installed from the external repository.
+6. For protected workflows, run `velen auth whoami`. Use
+   `velen auth session refresh` only when the user asks to refresh the session
+   or when diagnosing session freshness.
+7. If auth is missing or expired, prefer an existing `VELEN_ACCESS_TOKEN` or `velen auth import --input <path|->` for automated runs.
+8. If no headless credential source is available, run `velen auth login` and complete browser authorization.
 
 ### Step 2: Resolve org context
 
-1. Run `velen org current`.
-2. If the active org is unclear or wrong, run `velen org list`.
-3. If org resolution is still unclear, do not run org-scoped commands until a slug is chosen.
-4. Prefer `--org <slug>` for investigations and one-off checks.
-5. Resolve org selection in this precedence order: `--org <slug>`, non-empty
+1. Run `velen profile list` when profile context matters. Resolve profiles in
+   this order: `--profile <name>`, non-empty `VELEN_PROFILE`, then the persisted
+   active profile. Use `velen profile switch <name>` only when the user asks to
+   persist a new default profile; the command has no dry-run mode.
+2. Run `velen org current`.
+3. If the active org is unclear or wrong, run `velen org list`.
+4. If org resolution is still unclear, do not run org-scoped commands until a slug is chosen.
+5. Prefer `--org <slug>` for investigations and one-off checks.
+6. Resolve org selection in this precedence order: `--org <slug>`, non-empty
    `VELEN_ORG`, the nearest `.velen.config.json` from the current directory up
    through the Git root, then the selected profile's user-default `config.toml`.
-6. Use `velen org use <slug>` only when the user explicitly wants to persist a
+7. Use `velen org use <slug>` only when the user explicitly wants to persist a
    user default. Use `velen org use <slug> --workspace` when the user explicitly
    wants a repository default; this writes `.velen.config.json` at the Git root.
-7. Prefer the CLI command over hand-writing workspace config because it
+8. Prefer the CLI command over hand-writing workspace config because it
    validates org access and writes the versioned JSON atomically. After any
    config write, run `velen org current` and report its source and config path.
+9. Use `velen org get` for details about the resolved org. Use
+   `velen org create --name <name> --slug <slug>` only for an explicit org
+   creation request; inspect its schema first because it is a remote mutation
+   without dry-run support.
 
-### Step 3: Search Knowledge Graph memory
+### Step 3: Search Knowledge Graph memory for source-backed analysis
+
+Skip this step when the task does not rely on company data, source schemas,
+insights, SQL results, or stored analysis rules.
 
 1. Run `velen --org <slug> memory status`.
 2. Run `velen --org <slug> memory dataset list`.
@@ -159,6 +179,15 @@ local CLI/skill updates, plus CLI discovery and local CLI configuration.
    source where `QUERY` is `yes`; for source API tasks, choose the matching
    provider/source reference.
 7. Run `velen --org <slug> source show <provider://source-key>` to confirm provider, org, status, and query support or source identity before writing SQL or calling `velen api`. For workers, use the descriptor command from step 4 instead because they are not exposed by `source show`.
+8. When the user explicitly asks to create a source, inspect
+   `velen source connect --help` or its command schema. Run
+   `velen --org <slug> source connect --source <provider>` without `--input` to
+   get the provider guide, then execute `--input '<JSON>'` only with the user's
+   authorization. Unlike `velen api --input`, `source connect --input` accepts
+   inline JSON, not a file path or stdin. The command has no dry-run mode.
+9. After `source connect`, construct `<provider>://<sourceKey>` from the
+   structured result before calling `source show`. Do not copy a bare
+   `velen source show <sourceKey>` next-command hint.
 
 ### Step 5: Define metric semantics for KPI and product analytics
 
@@ -199,19 +228,22 @@ metric, or growth lever.
    window needs a larger bound. Use global `--timeout <sec>` only as an
    invocation-specific override instead of changing persisted config.
 7. If output is truncated or too broad, narrow the query and rerun with stronger filters, bounded dates, or smaller limits.
-8. For Knowledge Graph memory enrichment, create or select a narrow dataset,
+8. Use `velen --org <slug> query schema --source <source>` to discover query
+   namespaces and `velen --org <slug> query describe --source <source> --table
+   <schema.table>` for table metadata when the provider supports them.
+9. For Knowledge Graph memory enrichment, create or select a narrow dataset,
    persist curated facts with `velen --org <slug> memory remember ...`, and
    verify retrieval with `velen --org <slug> memory recall ...`.
-9. For a non-SQL source API task, use
+10. For a non-SQL source API task, use
    `velen --org <slug> api --source <provider://source-key> ...`. Start with
    `--dry-run` when operation inference, pagination, headers, or body shape is
    uncertain.
-10. For an explicitly requested Hermes Agent action, inspect the worker with
+11. For an explicitly requested Hermes Agent action, inspect the worker with
     `velen --org <slug> workers list`, describe it with
     `velen --org <slug> api --source hermes://<worker-key>`, then preview and
     send the narrow request through `/v1/responses` or `/v1/runs`. Do not call
     the Chronos-only `/api/cron/fire` webhook.
-11. If structured graph upsert is needed, first verify support with
+12. If structured graph upsert is needed, first verify support with
    `velen memory graph upsert --help` or
    `velen schema command memory graph upsert --output json` before use.
 
@@ -245,11 +277,15 @@ metric, or growth lever.
    `velen persona forget`, or `velen persona consolidate` only for the persona
    key and scope the user asked to change. Use `persona forget`, not delete,
    for removing one durable persona memory.
-13. Before `velen persona remember`, apply the human-memory test: could the
+13. Use `velen persona profile public list` and `velen persona profile copy`
+    to import a public persona. Treat `persona profile publish` as a super-admin
+    remote write and `persona profile delete` as destructive removal of a
+    profile and its durable memory; run either only for the exact user request.
+14. Before `velen persona remember`, apply the human-memory test: could the
     persona naturally say "I believe...", "I tend to...", "I remember...", or
     "I prefer..." about this? If yes, store it as persona memory. If no, put it
     in the profile JSON, source documentation, or tool/command contract instead.
-14. Keep persona memory concise and self-contained. Store only human-like
+15. Keep persona memory concise and self-contained. Store only human-like
     beliefs, habits, preferences, experiences, relationships, or durable context;
     do not store raw manuals, command syntax, output templates, broad source
     dumps, secrets, or customer-sensitive data as persona memory.

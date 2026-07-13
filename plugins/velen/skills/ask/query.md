@@ -11,9 +11,9 @@ This leaf skill extends the main `SKILL.md` in this directory.
 
 - Follow the main `SKILL.md` before running query commands.
 - Use `velen query validate` before `velen query execute` when SQL shape, access, or provider dialect is uncertain.
-- Source arguments must be provider-qualified references such as
-  `postgres://warehouse`; resolve them through `velen source list` or
-  `velen source show`.
+- Prefer provider-qualified source references such as `postgres://warehouse`.
+  Query commands also accept a bare source key when it resolves uniquely in the
+  selected org.
 - Start execution with the smallest cheap query that can answer the question.
 - For KPI, funnel, product analytics, or conversion questions, verify event
   semantics before optimizing on an event count. Check whether the event is raw
@@ -31,8 +31,11 @@ This leaf skill extends the main `SKILL.md` in this directory.
 ## Workflow
 
 1. Confirm the source is queryable with `velen --org <slug> source show <provider://source-key>`.
-2. Validate unfamiliar SQL with `velen --org <slug> query validate --source <provider://source-key> ...`.
-3. For KPI/product analytics, map the event funnel and identify whether a new
+2. Use `velen query schema --source <source>` and
+   `velen query describe --source <source> --table <schema.table>` when source
+   metadata is needed and the provider supports those operations.
+3. Validate unfamiliar SQL with `velen --org <slug> query validate --source <provider://source-key> ...`.
+4. For KPI/product analytics, map the event funnel and identify whether a new
    event or property is required before treating the queried metric as primary.
-4. Execute a bounded read-only SQL statement with `velen --org <slug> query execute --source <provider://source-key> ...`.
-5. Tighten filters or reduce result width before widening scope.
+5. Execute a bounded read-only SQL statement with `velen --org <slug> query execute --source <provider://source-key> ...`.
+6. Tighten filters or reduce result width before widening scope.

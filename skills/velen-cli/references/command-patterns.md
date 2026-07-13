@@ -4,11 +4,26 @@ Use these sequences when the user asks to query company data, inspect a
 source, explicitly investigate a past insight, or discover the Velen CLI
 surface.
 
+## Contents
+
+- Discover and configure the CLI
+- Inspect or connect sources and workers
+- Discover schemas and run bounded queries
+- Execute authorized source API or worker actions
+- Inspect requested insights
+- Manage Knowledge Graph and persona memory
+- Update the CLI or skill and recover from failures
+
 ## Discover The CLI Surface
 
 ```bash
 velen --help
+velen auth session refresh --help
+velen profile --help
+velen profile switch --help
 velen org --help
+velen org get --help
+velen org create --help
 velen source --help
 velen workers --help
 velen source connect --help
@@ -19,11 +34,15 @@ velen persona profile --help
 velen persona profile list --help
 velen persona profile public list --help
 velen persona profile copy --help
+velen persona profile publish --help
+velen persona profile delete --help
 velen persona remember --help
 velen persona forget --help
 velen persona consolidate --help
 velen query execute --help
 velen query validate --help
+velen query schema --help
+velen query describe --help
 velen update --help
 velen skill update --help
 velen memory --help
@@ -33,8 +52,8 @@ velen memory dataset rename --help
 velen memory dataset delete --help
 velen memory remember --help
 velen memory recall --help
+velen schema openapi --output json
 velen schema commands --output json
-velen schema skills --output json
 velen schema command query execute --output json
 velen schema command workers list --output json
 velen schema command update --output json
@@ -52,7 +71,9 @@ velen schema command memory recall --output json
 
 Use these when command shape, read controls, or packaged guardrails are
 unclear. Start with top-level help or `schema commands`, then inspect the
-narrowest subcommand before guessing flags.
+narrowest subcommand before guessing flags. `schema skills` may return an empty
+list because current builds install skills from the external repository; do not
+use it as the source of operational guardrails.
 
 For insight review, use `velen persona chat <PERSONA_KEY> --text ...` or
 `velen persona chat <PERSONA_KEY> --stdin` explicitly.
@@ -78,6 +99,19 @@ Interpretation:
 - `velen org list` is the recovery path when org access or org selection is unclear.
 - Prefer `velen --org <slug> ...` once the org is known instead of mutating
   persisted local state unless the user wants that change.
+
+## Configure Profiles
+
+Use `--profile <name>` for one invocation. Resolve profile selection in this
+order: `--profile`, non-empty `VELEN_PROFILE`, then the persisted active profile.
+Persist a new default only when requested:
+
+```bash
+velen profile list
+velen profile switch production
+```
+
+`profile switch` is a local write and currently has no dry-run mode.
 
 ## Configure Org Defaults
 
@@ -123,6 +157,16 @@ field, unsupported version, or invalid org slug is an error rather than an
 ignored fallback. `velen auth logout` clears stored authentication and the
 user-default org but does not remove repository-owned workspace config.
 
+## Inspect Or Create An Org
+
+Use `org get` to inspect the resolved org. Create an org only for an explicit
+request; `org create` is a remote mutation without dry-run support:
+
+```bash
+velen --org acme org get --output json
+velen org create --name "Acme" --slug acme --insight-prefix ACM
+```
+
 ## Inspect Sources Before Querying
 
 ```bash
@@ -135,8 +179,31 @@ the matching provider/source reference for source API work. Use `source show`
 to confirm the provider-qualified source reference, provider, status, org, query
 support, and sample query or source identity before writing SQL or calling
 `velen api`. Pass that
-`<provider>://<source-key>` reference to `source show`, `query`, and `api`
-commands.
+`<provider>://<source-key>` reference to `source show` and `api`, and prefer it
+for `query`. Query commands also accept a bare source key when it resolves to
+exactly one source in the selected org.
+
+## Connect A Source
+
+Load the provider-specific guide before sending credentials:
+
+```bash
+velen --org acme source connect --source postgres
+velen --org acme source connect --source postgres --input '{"sourceKey":"warehouse","credentials":{"connectionString":"..."}}'
+```
+
+Run the credential-bearing form only when the user explicitly asks to create
+the connection. Its `--input` accepts inline JSON, not a file path or stdin;
+this differs from `velen api --input <JSON|PATH|->`. `source connect` currently
+has no dry-run mode. Read `provider` and `sourceKey` from its structured result
+and verify with the canonical reference:
+
+```bash
+velen --org acme source show postgres://warehouse
+```
+
+Do not copy a returned `velen source show warehouse` hint; the `source show`
+parser requires `provider://source-key`.
 
 ## Inspect Workers Before Calling Them
 
@@ -159,6 +226,17 @@ velen --org acme query validate --source postgres://warehouse --sql "select 1"
 
 Use `query validate` first when the SQL is unfamiliar, the provider dialect is
 uncertain, or you want a cheap syntax and access check before execution.
+
+## Discover Query Schemas And Tables
+
+```bash
+velen --org acme query schema --source cloudflare_r2_sql://analytics
+velen --org acme query describe --source cloudflare_r2_sql://analytics --table reporting.events
+```
+
+Use these provider-specific metadata commands before guessing schemas or table
+columns. Prefer a provider-qualified source even though query commands can
+resolve an unambiguous bare source key.
 
 ## Run A Short Validation Query
 
@@ -217,7 +295,8 @@ velen --org acme api --source slack://workspace --op list_channels --paginate --
 
 Use `velen api` only through the Velen-managed source reference. Start with
 `--dry-run` when target inference, operation name, pagination, headers, method,
-or request body shape is uncertain. Keep operations read-only. Use
+or request body shape is uncertain. Execute read or write operations only
+within the exact scope the user authorized and the source descriptor permits. Use
 `--input <JSON|PATH|->` for request bodies and
 `--paginate --max-pages <n>` for bounded pagination.
 
@@ -432,6 +511,8 @@ velen --org acme persona profile list
 velen --org acme persona profile public list
 velen --org acme persona profile copy sophia
 velen --org acme persona profile upsert sophia --file ./personas/sophia.profile.json --display-name "Sophia" --persona-version 2026-06
+velen --org acme persona profile publish sophia --as sophia-public
+velen --org acme persona profile delete sophia
 velen --org acme persona remember sophia --kind style --title "Review tone" --summary "Prefer direct critique with concrete evidence and caveats." --confidence 0.9 --privacy internal
 velen --org acme persona forget sophia memory_123 --source-title "Obsolete review tone"
 velen --org acme persona consolidate sophia
@@ -442,6 +523,11 @@ DB-backed persona profiles or durable persona memory. Use `--user-scoped` when
 the requested memory should apply only to the current CLI user rather than the
 org-wide persona. Use `persona forget`, not delete, when removing one durable
 persona memory by id.
+
+Use `persona profile publish` only for an explicit super-admin publishing
+request. Use `persona profile delete` only when the user explicitly asks to
+remove the whole org profile and its durable memory; it is broader than
+`persona forget`.
 
 Keep persona profile and persona memory separate:
 
@@ -474,21 +560,30 @@ and then installs or updates the packaged `velen-cli` agent skill from
 ```bash
 velen auth login
 velen auth import --input ./session.json
+velen profile list
 velen org list
+velen --org acme org get
 velen --org acme source list
+velen --org acme source connect --source postgres
 velen --org acme workers list
 velen --org acme api --source hermes://hermes-agent
 velen --org acme source show postgres://warehouse
 velen --org acme memory status
 velen --org acme memory dataset list
 velen query execute --help
+velen query schema --help
+velen query describe --help
 ```
 
 Map failures to the smallest recovery step first:
 
 - Auth problems: `velen auth login` or `velen auth import --input ...`
+- Profile problems: `velen profile list`, then use `--profile <name>` for a
+  one-off retry
 - Org problems: `velen org list`
 - Source lookup problems: `velen --org <slug> source list`
+- Source connection problems: load the guide again with
+  `velen --org <slug> source connect --source <provider>`
 - Worker lookup problems: `velen --org <slug> workers list`, then inspect the
   returned reference with `velen --org <slug> api --source <worker-reference>`
 - Query shape problems: `velen query execute --help` or
