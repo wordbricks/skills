@@ -10,6 +10,7 @@ surface.
 velen --help
 velen org --help
 velen source --help
+velen workers --help
 velen source connect --help
 velen api --help
 velen persona --help
@@ -35,6 +36,7 @@ velen memory recall --help
 velen schema commands --output json
 velen schema skills --output json
 velen schema command query execute --output json
+velen schema command workers list --output json
 velen schema command update --output json
 velen schema command persona chat --output json
 velen schema command persona profile list --output json
@@ -136,6 +138,19 @@ support, and sample query or source identity before writing SQL or calling
 `<provider>://<source-key>` reference to `source show`, `query`, and `api`
 commands.
 
+## Inspect Workers Before Calling Them
+
+```bash
+velen --org acme workers list
+velen --org acme api --source hermes://hermes-agent
+```
+
+Workers perform work on behalf of the caller and are intentionally separate
+from passive sources, so a Hermes worker appears in `workers list` rather than
+`source list`. The default human-readable worker list prints a copyable
+`velen api --source <worker-reference>` hint. Run that descriptor command
+without a target to inspect supported paths, methods, notes, and examples.
+
 ## Validate Query Shape Before Execution
 
 ```bash
@@ -205,6 +220,33 @@ Use `velen api` only through the Velen-managed source reference. Start with
 or request body shape is uncertain. Keep operations read-only. Use
 `--input <JSON|PATH|->` for request bodies and
 `--paginate --max-pages <n>` for bounded pagination.
+
+## Send An Explicit Hermes Agent Request
+
+Resolve and inspect the connected worker first:
+
+```bash
+velen --org acme workers list
+velen --org acme api --source hermes://hermes-agent
+```
+
+Preview the exact request without sending it:
+
+```bash
+velen --org acme api --source hermes://hermes-agent /v1/runs --method POST --input '{"input":"Investigate the production API failures"}' --dry-run --output json
+```
+
+Only when the user explicitly asked for that worker action, remove `--dry-run`:
+
+```bash
+velen --org acme api --source hermes://hermes-agent /v1/runs --method POST --input '{"input":"Investigate the production API failures"}' --output json
+velen --org acme api --source hermes://hermes-agent /v1/responses --method POST --input '{"model":"hermes-agent","input":"Inspect the production API"}' --output json
+```
+
+Use `/v1/runs` for a native Hermes run and `/v1/responses` for the
+OpenAI-compatible response surface. The Hermes API key remains server-side and
+is sent as Bearer authentication. Do not call `/api/cron/fire`; that endpoint
+requires a separate short-lived Chronos JWT and is not part of this flow.
 
 ## Query Company Data
 
@@ -434,6 +476,8 @@ velen auth login
 velen auth import --input ./session.json
 velen org list
 velen --org acme source list
+velen --org acme workers list
+velen --org acme api --source hermes://hermes-agent
 velen --org acme source show postgres://warehouse
 velen --org acme memory status
 velen --org acme memory dataset list
@@ -445,6 +489,8 @@ Map failures to the smallest recovery step first:
 - Auth problems: `velen auth login` or `velen auth import --input ...`
 - Org problems: `velen org list`
 - Source lookup problems: `velen --org <slug> source list`
+- Worker lookup problems: `velen --org <slug> workers list`, then inspect the
+  returned reference with `velen --org <slug> api --source <worker-reference>`
 - Query shape problems: `velen query execute --help` or
   `velen schema command query execute --output json`
 - Queryability problems: pick a source with `QUERY` set to `yes`

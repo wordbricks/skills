@@ -10,7 +10,12 @@ This leaf skill extends the main `SKILL.md` in this directory.
 ## Guardrails
 
 - Follow the main `SKILL.md` before running local state mutations.
-- Do not assume write access to remote data-plane resources through the public CLI surface except for explicit user-requested Knowledge Graph memory or persona memory commands.
+- Do not assume write access to remote data-plane resources through the public
+  CLI surface except for explicit user-requested Knowledge Graph memory,
+  persona memory, or connected-worker actions.
+- Treat a connected-worker request as remote work. Send one only when the user
+  explicitly asks for that action, preview body-bearing requests with
+  `velen api --dry-run`, and keep the request within the named worker and task.
 - Prefer explicit confirmation before changing persistent local CLI state.
 - Treat `velen memory dataset delete` as destructive: use it only when the user explicitly asks to delete that dataset.
 - Use `velen update --dry-run`, `velen skill update --dry-run`, or
@@ -26,4 +31,10 @@ This leaf skill extends the main `SKILL.md` in this directory.
 5. Use `velen --org <slug> memory dataset delete <dataset_key>` only after the user explicitly asks to remove that dataset.
 6. For explicit persona memory changes, inspect `velen persona --help` or the narrow schema command, then use the smallest matching command: `velen persona profile list`, `velen persona profile upsert`, `velen persona remember`, `velen persona forget`, or `velen persona consolidate`. Use `velen persona forget`, not delete, when the user asks to remove one durable persona memory.
 7. For local tool updates, `velen update` updates the binary first and then the packaged `velen-cli` skill; `--package-manager bun|npm` selects the binary installer.
-8. Report the resulting org, dataset key or persona key, local command path, and Request ID when available.
+8. For an explicit Hermes Agent request, resolve the reference with
+   `velen --org <slug> workers list`, inspect the descriptor with
+   `velen --org <slug> api --source hermes://<worker-key>`, preview the exact
+   `/v1/responses` or `/v1/runs` POST, then execute it. Never route this flow
+   through the Chronos-only `/api/cron/fire` webhook.
+9. Report the resulting org, worker reference, dataset key or persona key,
+   local command path, and Request ID when available.

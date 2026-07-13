@@ -1,4 +1,4 @@
 interface:
   display_name: "Velen CLI"
-  short_description: "Inspect Velen data, memory, and CLI state"
-  default_prompt: "Use $velen-cli to inspect Velen-connected company data, choose the right org and provider-qualified source reference, avoid past insight lookup unless explicitly requested, manage org-scoped Knowledge Graph or persona memory when requested, run bounded read-only query validate, query execute, or source API flows, update the CLI/agent skill when asked, and summarize the evidence."
+  short_description: "Inspect Velen data, workers, memory, and CLI state"
+  default_prompt: "Use $velen-cli to inspect Velen-connected company data, resolve the right org and provider-qualified source or worker reference, run bounded read-only queries or explicitly requested worker actions, manage memory when requested, and summarize the evidence."
