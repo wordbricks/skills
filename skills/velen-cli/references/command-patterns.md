@@ -64,15 +64,62 @@ velen profile list
 velen org current
 velen org list
 velen org use acme
+velen org use acme --workspace
 ```
 
 Interpretation:
 
 - `velen auth whoami` confirms the current identity and the effective org source.
-- `velen org current` shows whether org resolution came from `--org`, config, or is unresolved.
+- `velen org current` shows whether org resolution came from `--org`,
+  `VELEN_ORG`, workspace config, the user default, or is unresolved. For a
+  workspace selection, report the exact config path.
 - `velen org list` is the recovery path when org access or org selection is unclear.
 - Prefer `velen --org <slug> ...` once the org is known instead of mutating
   persisted local state unless the user wants that change.
+
+## Configure Org Defaults
+
+Use a user-wide default only when the user asks to persist the org outside a
+single repository:
+
+```bash
+velen org use acme
+velen org current
+```
+
+Use a repository default when the user asks to pin a Git workspace to an org:
+
+```bash
+cd /path/to/repository
+velen org use acme --workspace
+velen org current
+```
+
+The workspace command validates org visibility and writes this versioned file
+at the Git root:
+
+```json
+{
+  "version": 1,
+  "org": "acme"
+}
+```
+
+The filename is `.velen.config.json`. Discovery starts in the current
+directory, walks upward, uses the nearest file, and stops after checking the
+Git root. A nested config can therefore override the repository-root config.
+Resolve org selection in this order:
+
+1. `--org <slug>`
+2. Non-empty `VELEN_ORG`
+3. Nearest `.velen.config.json`
+4. The selected profile's user-default `config.toml`
+
+Prefer `velen org use <slug> --workspace` over manually creating the JSON so
+the CLI validates access and writes atomically. A malformed file, unknown
+field, unsupported version, or invalid org slug is an error rather than an
+ignored fallback. `velen auth logout` clears stored authentication and the
+user-default org but does not remove repository-owned workspace config.
 
 ## Inspect Sources Before Querying
 
@@ -200,7 +247,9 @@ velen --org acme query execute --source postgres://warehouse --sql "select 1"
 velen org use acme
 ```
 
-Use `--org <slug>` for one-off checks. Use `velen org use <slug>` only when the rest of the session should stay pinned to that org.
+Use `--org <slug>` for one-off checks. Use `velen org use <slug>` for a
+user-wide default, or `velen org use <slug> --workspace` when a repository
+should stay pinned to that org.
 
 ## Resolve Informal Source Names
 

@@ -1,6 +1,6 @@
 ---
 name: velen-cli
-description: Use when the user wants to inspect company or customer data that lives behind Velen, run ad hoc read-only SQL or read-only source API calls against a Velen-connected source, explicitly inspect a past Velen insight by public ID or catalog request, manage org-scoped Knowledge Graph or persona memory through Velen, or update the Velen CLI/agent skill. Do not use for local databases, direct credentials, or SQL/API work that bypasses Velen access controls.
+description: Use when the user wants to inspect company or customer data that lives behind Velen, configure Velen CLI org selection or local profiles, run ad hoc read-only SQL or read-only source API calls against a Velen-connected source, explicitly inspect a past Velen insight by public ID or catalog request, manage org-scoped Knowledge Graph or persona memory through Velen, or update the Velen CLI/agent skill. Do not use for local databases, direct credentials, or SQL/API work that bypasses Velen access controls.
 ---
 
 # Velen CLI
@@ -11,15 +11,19 @@ Use `velen` when you need auditable terminal access to a company's Velen-connect
 
 This skill is for read-only analysis through Velen-managed access, org-scoped
 Knowledge Graph and persona memory management, local CLI/skill updates, plus
-CLI discovery.
+CLI discovery and local CLI configuration.
 
 - Use it when the user wants company or customer data that is expected to be available through Velen, wants to validate a metric with ad hoc SQL or read-only source API access, explicitly asks to inspect a past Velen insight, asks to manage Velen memory, or asks to update the Velen CLI or packaged agent skill.
 - Do not use it for local databases, direct credentials, DDL, or product/documentation questions that do not require CLI access.
 - Treat remote writes as out of scope except for explicit user-requested
   Knowledge Graph operations exposed by `velen memory ...` or persona memory
   operations exposed by `velen persona ...`.
-- Once org resolution is clear, prefer `--org <slug>` on org-scoped commands
-  rather than relying on persisted local state.
+- Treat `velen org use <slug>` and `velen org use <slug> --workspace` as local
+  configuration writes. Run them only when the user explicitly asks to persist
+  an org selection.
+- Once org resolution is clear, prefer `--org <slug>` for one-off org-scoped
+  commands. Respect an explicitly requested workspace default instead of
+  redundantly overriding it on every command.
 - Provider-specific sources are still in scope when Velen is the access path.
   If the user asks for "warehouse data", "customer metrics", source API data,
   or a quick SQL check without naming Velen, prefer this skill when the
@@ -35,7 +39,9 @@ CLI discovery.
 ## Guardrails
 
 - Prefer `--output json` when the caller needs machine-readable output.
-- Always pass `--org <slug>` for org-scoped commands unless the command is explicitly org-agnostic.
+- Prefer `--org <slug>` for investigations and one-off org-scoped commands.
+  Rely on workspace or user-default config only when that persisted selection
+  is intentional and confirmed with `velen org current`.
 - Bound reads aggressively before widening scope.
 - Use `--request-id <id>` when a multi-step investigation needs stable trace correlation.
 - Prefer the CLI's built-in 180-second request timeout. Omit `--timeout` for
@@ -100,7 +106,7 @@ CLI discovery.
 3. If the user asks to update an existing Velen install, use `velen update`
    or `velen update --package-manager npm`. Use `velen update --dry-run` or
    `velen skill update --dry-run` to preview local install effects.
-4. If the task is only command, skill, schema, or update discovery, inspect
+4. If the task is only command, config, skill, schema, or update discovery, inspect
    `velen --help`, `velen <command> --help`,
    `velen schema commands --output json`, or
    `velen schema command <path> --output json` before doing anything
@@ -115,7 +121,15 @@ CLI discovery.
 2. If the active org is unclear or wrong, run `velen org list`.
 3. If org resolution is still unclear, do not run org-scoped commands until a slug is chosen.
 4. Prefer `--org <slug>` for investigations and one-off checks.
-5. Use `velen org use <slug>` only when the user explicitly wants to persist local state.
+5. Resolve org selection in this precedence order: `--org <slug>`, non-empty
+   `VELEN_ORG`, the nearest `.velen.config.json` from the current directory up
+   through the Git root, then the selected profile's user-default `config.toml`.
+6. Use `velen org use <slug>` only when the user explicitly wants to persist a
+   user default. Use `velen org use <slug> --workspace` when the user explicitly
+   wants a repository default; this writes `.velen.config.json` at the Git root.
+7. Prefer the CLI command over hand-writing workspace config because it
+   validates org access and writes the versioned JSON atomically. After any
+   config write, run `velen org current` and report its source and config path.
 
 ### Step 3: Search Knowledge Graph memory
 
