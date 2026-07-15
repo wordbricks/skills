@@ -8,8 +8,8 @@ This repository contains the Wordbricks Claude Code marketplace plugins plus sta
   Code for authenticated org discovery, source inspection, and read-only query
   workflows.
 - [`velen`](./plugins/velen/README.md): Use the Velen CLI from Claude Code for
-  authenticated org discovery, insight inspection, read-only Velen-managed data
-  access, and org-scoped Knowledge Graph memory workflows.
+  authenticated org discovery, insight inspection, read-only SQL, runtime-advertised
+  source API operations, and org-scoped Knowledge Graph memory workflows.
 
 ## Available Skills
 

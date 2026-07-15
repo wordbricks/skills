@@ -193,18 +193,25 @@ including parameters or request fields that are awkward as convenience flags.
 Do not combine `--input` with `--sql`, `--file`, `--stdin`, `--max-rows`,
 `--max-bytes`, `--cell-max-chars`, or `--timeout-ms`.
 
-## Use A Non-SQL Source API
+## Use A Source API Descriptor As The Capability Contract
 
 ```bash
-velen --org acme api --source slack://workspace --dry-run
-velen --org acme api --source slack://workspace --op list_channels --paginate --max-pages 2 --output json
+velen --org acme api --source <provider://source-key> --output json
+velen --org acme api --source <provider://source-key> --op <advertised-operation> <selector-if-required> --input '<descriptor-shaped-json>' --dry-run --output json
+velen --org acme api --source <provider://source-key> --op <advertised-operation> <selector-if-required> --input '<descriptor-shaped-json>' --output json
 ```
 
-Use `velen api` only through the Velen-managed source reference. Start with
-`--dry-run` when target inference, operation name, pagination, headers, method,
-or request body shape is uncertain. Keep operations read-only. Use
-`--input <JSON|PATH|->` for request bodies and
-`--paginate --max-pages <n>` for bounded pagination.
+The first command describes the selected source without executing an
+operation. Treat its operations, selector and field policies, examples, and
+notes as the source of truth; never copy an operation name or payload contract
+from this skill or another provider.
+
+For operations that only read, apply the descriptor's pagination contract and
+bound pagination with `--paginate --max-pages <n>` when supported. For an
+operation that creates, updates, sends, deletes, or otherwise changes external
+state, require an explicit user request and run the exact request with
+`--dry-run` before executing it. If the descriptor omits the operation, stop
+instead of attempting a method override or raw-request bypass.
 
 ## Query Company Data
 
@@ -212,8 +219,8 @@ or request body shape is uncertain. Keep operations read-only. Use
 - Narrow source selection by the most relevant product name or provider before inspecting multiple candidates.
 - Confirm the source with `velen --org <slug> source show <provider://source-key>`.
 - For SQL, start with a bounded aggregate or `select 1` before wider inspection.
-- For source API, start with `velen api --dry-run` before executing a paginated
-  or body-bearing request.
+- For source API, load the current descriptor first. Use `--dry-run` before any
+  advertised operation that changes external state.
 
 ## Validate A Metric
 

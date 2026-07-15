@@ -17,10 +17,17 @@ This leaf skill extends the main `SKILL.md` in this directory.
 - Resolve org and source ambiguity before moving on to query execution.
 - Sources used by `source show`, `query`, and `api` must be
   provider-qualified, for example `postgres://warehouse`.
+- Use `velen --org <slug> api --source <provider://source-key> --output json`
+  without an operation or target to discover the current source API descriptor.
+- Treat that descriptor as the source of truth for provider operations, input
+  policy, selectors, pagination, examples, and notes. Do not infer capabilities
+  from the provider name, skill text, or an earlier run.
 
 ## Workflow
 
 1. For command discovery, start with help or schema commands before auth.
 2. For protected data discovery, confirm auth and org context.
 3. Use `velen org current`, `velen org list`, `velen --org <slug> source list`, and `velen --org <slug> source show <provider://source-key>` to narrow the target.
-4. Use `velen schema command <path> --output json` when you need the exact current command contract.
+4. For source API work, inspect the selected source's descriptor and report the
+   relevant operation contract before preparing a request.
+5. Use `velen schema command <path> --output json` when you need the exact current command contract.
