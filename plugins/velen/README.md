@@ -20,9 +20,10 @@ Invoke the plugin skill with:
 ```
 
 Use it to authenticate with the Velen CLI, resolve org and source context,
-inspect published insights, run bounded read-only queries through
-Velen-managed access, and manage org-scoped Knowledge Graph memory when
-explicitly requested.
+inspect published insights, run bounded read-only SQL, use source API
+operations advertised by the current Velen descriptor, and manage org-scoped
+Knowledge Graph memory. External writes require an explicit request and an
+exact dry run first.
 
 ## Local Development
 
