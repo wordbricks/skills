@@ -196,33 +196,32 @@ metric, or growth lever.
 
 ### Step 6: Run the smallest useful operation
 
-1. For unfamiliar SQL, start with `velen --org <slug> query validate --source <provider://source-key> ...`.
-2. For execution, start with a cheap query such as `select 1`, a row count, or a bounded aggregate via `velen --org <slug> query execute --source <provider://source-key> ...`.
-3. Use provider-appropriate read-only SQL only.
-4. Prefer `--file <path.sql>` or `--stdin` for multi-line SQL. Use
+1. Execute the smallest bounded query that can answer the question, such as a row count or aggregate, via `velen --org <slug> query execute --source <provider://source-key> ...`.
+2. Use provider-appropriate read-only SQL only.
+3. Prefer `--file <path.sql>` or `--stdin` for multi-line SQL. Use
    `--input <path|->` only when you need to send a full JSON query request
    payload; do not mix it with convenience result-window flags.
-5. Use `--max-rows`, `--max-bytes`, `--cell-max-chars`, `--page-size`, and explicit SQL filters to bound results.
-6. Use the built-in 180-second request timeout by default. For one-off slow
+4. Use `--max-rows`, `--max-bytes`, `--cell-max-chars`, `--page-size`, and explicit SQL filters to bound results.
+5. Use the built-in 180-second request timeout by default. For one-off slow
    query execution, prefer query `--timeout-ms <ms>` when the query result
    window needs a larger bound. Use global `--timeout <sec>` only as an
    invocation-specific override instead of changing persisted config.
-7. If output is truncated or too broad, narrow the query and rerun with stronger filters, bounded dates, or smaller limits.
-8. For Knowledge Graph memory enrichment, create or select a narrow dataset,
+6. If output is truncated or too broad, narrow the query and rerun with stronger filters, bounded dates, or smaller limits.
+7. For Knowledge Graph memory enrichment, create or select a narrow dataset,
    persist curated facts with `velen --org <slug> memory remember ...`, and
    verify retrieval with `velen --org <slug> memory recall ...`.
-9. For a source API task, first run
+8. For a source API task, first run
    `velen --org <slug> api --source <provider://source-key> --output json`
    without an operation or target and use only an operation advertised in the
    returned descriptor.
-10. Follow the descriptor's selector, input, field, pagination, and notes
+9. Follow the descriptor's selector, input, field, pagination, and notes
     contract instead of relying on provider-specific instructions in this
     skill.
-11. Before an advertised operation that changes external state, confirm that
+10. Before an advertised operation that changes external state, confirm that
     the user requested the exact effect, run the same command with `--dry-run`,
     review the prepared operation and selector, then execute it without
     `--dry-run`.
-12. If structured graph upsert is needed, first verify support with
+11. If structured graph upsert is needed, first verify support with
    `velen memory graph upsert --help` or
    `velen schema command memory graph upsert --output json` before use.
 

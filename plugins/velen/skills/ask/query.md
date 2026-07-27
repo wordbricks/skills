@@ -10,7 +10,6 @@ This leaf skill extends the main `SKILL.md` in this directory.
 ## Guardrails
 
 - Follow the main `SKILL.md` before running query commands.
-- Use `velen query validate` before `velen query execute` when SQL shape, access, or provider dialect is uncertain.
 - Source arguments must be provider-qualified references such as
   `postgres://warehouse`; resolve them through `velen source list` or
   `velen source show`.
@@ -31,8 +30,7 @@ This leaf skill extends the main `SKILL.md` in this directory.
 ## Workflow
 
 1. Confirm the source is queryable with `velen --org <slug> source show <provider://source-key>`.
-2. Validate unfamiliar SQL with `velen --org <slug> query validate --source <provider://source-key> ...`.
-3. For KPI/product analytics, map the event funnel and identify whether a new
+2. For KPI/product analytics, map the event funnel and identify whether a new
    event or property is required before treating the queried metric as primary.
-4. Execute a bounded read-only SQL statement with `velen --org <slug> query execute --source <provider://source-key> ...`.
-5. Tighten filters or reduce result width before widening scope.
+3. Execute a bounded read-only SQL statement with `velen --org <slug> query execute --source <provider://source-key> ...`.
+4. Tighten filters or reduce result width before widening scope.

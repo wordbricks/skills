@@ -22,7 +22,6 @@ velen persona remember --help
 velen persona forget --help
 velen persona consolidate --help
 velen query execute --help
-velen query validate --help
 velen update --help
 velen skill update --help
 velen memory --help
@@ -136,23 +135,6 @@ support, and sample query or source identity before writing SQL or calling
 `<provider>://<source-key>` reference to `source show`, `query`, and `api`
 commands.
 
-## Validate Query Shape Before Execution
-
-```bash
-velen --org acme query validate --source postgres://warehouse --sql "select 1"
-```
-
-Use `query validate` first when the SQL is unfamiliar, the provider dialect is
-uncertain, or you want a cheap syntax and access check before execution.
-
-## Run A Short Validation Query
-
-```bash
-velen --org acme query execute --source postgres://warehouse --sql "select 1" --max-rows 10
-```
-
-Use this first when you want to verify auth, org, source selection, and queryability without spending time on a large query.
-
 ## Run A Real Analysis Query
 
 ```bash
@@ -174,7 +156,6 @@ Guidance:
 ## Use File Or Stdin For Longer SQL
 
 ```bash
-velen --org acme query validate --source postgres://warehouse --file ./analysis.sql
 velen --org acme query execute --source postgres://warehouse --file ./analysis.sql --max-rows 200
 cat ./analysis.sql | velen --org acme query execute --source postgres://warehouse --stdin
 ```
@@ -185,7 +166,6 @@ Prefer `--file` or `--stdin` for multi-line SQL so the query can be inspected, r
 
 ```bash
 cat ./query-request.json | velen --org acme query execute --source postgres://warehouse --input -
-velen --org acme query validate --source postgres://warehouse --input ./query-request.json
 ```
 
 Use `--input <path|->` when you need to send the full JSON query request body,
@@ -218,7 +198,7 @@ instead of attempting a method override or raw-request bypass.
 - Resolve the org first, then inspect sources in that org.
 - Narrow source selection by the most relevant product name or provider before inspecting multiple candidates.
 - Confirm the source with `velen --org <slug> source show <provider://source-key>`.
-- For SQL, start with a bounded aggregate or `select 1` before wider inspection.
+- For SQL, execute the smallest bounded aggregate or count that can answer the question.
 - For source API, load the current descriptor first. Use `--dry-run` before any
   advertised operation that changes external state.
 
@@ -250,7 +230,6 @@ instead of attempting a method override or raw-request bypass.
 
 ```bash
 velen --org acme source list
-velen --org acme query execute --source postgres://warehouse --sql "select 1"
 velen org use acme
 ```
 
