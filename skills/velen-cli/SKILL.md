@@ -19,8 +19,8 @@ CLI/skill updates, plus CLI discovery and local CLI configuration.
   source of truth. Do not hardcode or retain provider operation lists in this
   skill.
 - Run an operation that changes an external system only when the user
-  explicitly requests that effect and the current source descriptor advertises
-  the operation.
+  explicitly requests that effect or an active domain workflow narrowly
+  authorizes it, and the current source descriptor advertises the operation.
 - Treat `velen org use <slug>` and `velen org use <slug> --workspace` as local
   configuration writes. Run them only when the user explicitly asks to persist
   an org selection.
@@ -60,8 +60,9 @@ CLI/skill updates, plus CLI discovery and local CLI configuration.
   attempt to reach it through a method override or raw request body.
 - Treat an operation as a remote write when its descriptor indicates that it
   creates, updates, sends, deletes, or otherwise changes external state. If the
-  effect is ambiguous, treat it as a write. Require explicit user intent and
-  run the exact operation with `--dry-run` before executing it.
+  effect is ambiguous, treat it as a write. Require explicit user intent or
+  narrow authorization from the active domain workflow, and run the exact
+  operation with `--dry-run` before executing it.
 - Do not run `velen insight list` or `velen insight get` unless the user
   directly asks to inspect past insights, provides an insight public ID for
   lookup, or asks to verify or extend a specific existing insight. Do not use
@@ -73,11 +74,14 @@ CLI/skill updates, plus CLI discovery and local CLI configuration.
   If the current instrumentation cannot support the KPI cleanly, make the
   smallest measurement fix an explicit action item before listing product
   optimization ideas.
-- For every user request handled with Velen, search Knowledge Graph memory at
-  least once after resolving org context and before relying on source schemas,
-  insights, or SQL results. Use it to discover metric definitions, attribution
-  rules, caveats, known bad columns, preferred datasets, and prior verified
-  analysis rules.
+- For one multi-phase task, perform auth, org resolution, Knowledge Graph
+  recall, source discovery, and descriptor inspection once. Reuse that run
+  context when downstream skills load Velen again. Repeat only when auth
+  expires, the org or source changes, the descriptor rejects the intended
+  operation, or other evidence makes the context stale.
+- For a remote object mutation, read the current target when the source exposes
+  a read operation, execute the smallest advertised change after the required
+  preview, then read it back and verify the intended result.
 - For Knowledge Graph memory writes, only store concise, verified facts,
   provenance, schema notes, metric definitions, caveats, or explicit node/edge
   payloads that the user asked to persist.
@@ -102,13 +106,13 @@ CLI/skill updates, plus CLI discovery and local CLI configuration.
   headless auth session (`VELEN_ACCESS_TOKEN` or `velen auth import --input <path|->`).
 - Install and login may require network access, permission to install global packages, and an interactive browser/device-code authorization step.
 - SQL tasks must stay read-only. Source API operations may change external
-  systems only when the current descriptor advertises the operation and the
-  user explicitly requests that effect. Knowledge Graph and persona memory
-  writes likewise require an explicit user request.
+  systems only under the mutation guardrails above. Knowledge Graph and persona
+  memory writes likewise require explicit user intent.
 
 ## Required Workflow
 
-**Follow these steps in order. Do not skip steps.**
+**Follow these steps in order once per task, then reuse the run context as
+described above. Do not skip a step that the task has not already completed.**
 
 ### Step 1: Confirm CLI availability and auth
 
@@ -217,11 +221,7 @@ metric, or growth lever.
 9. Follow the descriptor's selector, input, field, pagination, and notes
     contract instead of relying on provider-specific instructions in this
     skill.
-10. Before an advertised operation that changes external state, confirm that
-    the user requested the exact effect, run the same command with `--dry-run`,
-    review the prepared operation and selector, then execute it without
-    `--dry-run`.
-11. If structured graph upsert is needed, first verify support with
+10. If structured graph upsert is needed, first verify support with
    `velen memory graph upsert --help` or
    `velen schema command memory graph upsert --output json` before use.
 

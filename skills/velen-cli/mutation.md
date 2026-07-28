@@ -10,14 +10,8 @@ This leaf skill extends the main `SKILL.md` in this directory.
 ## Guardrails
 
 - Follow the main `SKILL.md` before running local state mutations.
-- Treat the current source API descriptor as the source of truth for available
-  remote operations. Do not keep provider-specific write capability lists in
-  this skill.
-- Run a remote operation only when the user explicitly requests its effect and
-  the descriptor advertises it. If the descriptor omits it, do not bypass the
-  contract with method overrides or raw requests.
-- Run an advertised remote write with `--dry-run` first and review the prepared
-  operation, selector, and input before executing it.
+- Inherit its run-context reuse, descriptor, authorization, preview, and
+  read-back rules instead of repeating them here.
 - Prefer explicit confirmation before changing persistent local CLI state.
 - Treat `velen memory dataset delete` as destructive: use it only when the user explicitly asks to delete that dataset.
 - Use `velen update --dry-run`, `velen skill update --dry-run`, or
@@ -27,9 +21,8 @@ This leaf skill extends the main `SKILL.md` in this directory.
 ## Workflow
 
 1. Distinguish local state changes such as `velen auth import`, `velen auth logout`, or `velen org use` from remote source API or memory mutations.
-2. For a source API mutation, resolve the org and provider-qualified source,
-   fetch the current descriptor, confirm the requested operation and input are
-   advertised, run the exact request with `--dry-run`, then execute it.
+2. For a source API mutation, use the resolved run context and execute the
+   smallest matching operation under the main skill's mutation rules.
 3. For Knowledge Graph memory changes, inspect `velen memory dataset --help` or `velen schema command memory dataset <subcommand> --output json` before guessing flags.
 4. Use `velen --org <slug> memory dataset describe <dataset_key>` before risky dataset changes when the current scope is unclear.
 5. Use `velen --org <slug> memory dataset rename <dataset_key> --name <name>` for display-name changes.
